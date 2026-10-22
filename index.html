@@ -892,6 +892,8 @@
           <div style="min-width:155px;">
             <label for="selectWeekDays" class="form-label">School Week</label>
             <select id="selectWeekDays" class="form-select">
+              <option value="sun_thu" selected>5 Days (Sun – Thu)</option>
+              <option value="sat_thu">6 Days (Sat – Thu)</option>
               <option value="5">5 Days (Mon – Fri)</option>
               <option value="6">6 Days (Mon – Sat)</option>
             </select>
@@ -1267,7 +1269,12 @@
       ];
     }
 
-    const ALL_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const WEEK_PATTERNS = {
+      sun_thu: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'],
+      sat_thu: ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'],
+      '5': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      '6': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    };
 
     function splitPeriodsAcrossClasses(totalPeriods, count) {
       if (count <= 0) return [];
@@ -1304,6 +1311,7 @@
       selectedClassId: 'KG1-M',
       selectedTeacher: '',
       selectedDayIndex: 0,
+      weekPattern: 'sun_thu',
       daysCount: 5,
       periodsPerDay: 8,
       breaks: getDefaultBreaks(),
@@ -1323,6 +1331,10 @@
       unplacedPeriods: [],
       clashList: []
     };
+
+    function getActiveDays() {
+      return WEEK_PATTERNS[state.weekPattern] || WEEK_PATTERNS.sun_thu;
+    }
 
     function getDailySlots() {
       const slots = [];
@@ -1353,7 +1365,7 @@
 
     function loadSavedState() {
       try {
-        const raw = localStorage.getItem('timetable_maker_state_v5');
+        const raw = localStorage.getItem('timetable_maker_state_v6');
         if (raw) {
           const parsed = JSON.parse(raw);
           if (Array.isArray(parsed.classes) && parsed.classes.length > 0) {
@@ -1368,7 +1380,10 @@
           if (parsed.teacherTargetQuota >= 1 && parsed.teacherTargetQuota <= 60) {
             state.teacherTargetQuota = Number(parsed.teacherTargetQuota);
           }
-          if (parsed.daysCount === 5 || parsed.daysCount === 6) {
+          if (parsed.weekPattern && WEEK_PATTERNS[parsed.weekPattern]) {
+            state.weekPattern = parsed.weekPattern;
+            state.daysCount = WEEK_PATTERNS[parsed.weekPattern].length;
+          } else if (parsed.daysCount === 5 || parsed.daysCount === 6) {
             state.daysCount = parsed.daysCount;
           }
           if (Array.isArray(parsed.assignments)) {
@@ -1385,12 +1400,13 @@
 
     function saveState() {
       try {
-        localStorage.setItem('timetable_maker_state_v5', JSON.stringify({
+        localStorage.setItem('timetable_maker_state_v6', JSON.stringify({
           classes: state.classes,
           breaks: state.breaks,
           periodsPerDay: state.periodsPerDay,
           teacherTargetQuota: state.teacherTargetQuota,
           assignments: state.assignments,
+          weekPattern: state.weekPattern,
           daysCount: state.daysCount
         }));
       } catch (err) {
@@ -1637,7 +1653,7 @@
               const tk = cell.teacher.trim().toLowerCase();
               if (seenTeachers[tk]) {
                 clashes.push({
-                  day: ALL_DAYS[d],
+                  day: getActiveDays()[d],
                   period: p,
                   teacher: cell.teacher,
                   classA: seenTeachers[tk],
@@ -1813,7 +1829,7 @@
       }
 
       const daySelect = document.getElementById('selectDayTarget');
-      const activeDays = ALL_DAYS.slice(0, state.daysCount);
+      const activeDays = getActiveDays();
       if (state.selectedDayIndex >= activeDays.length) {
         state.selectedDayIndex = 0;
       }
@@ -1850,7 +1866,7 @@
       const heading = document.getElementById('timetableHeading');
       const subheading = document.getElementById('timetableSubheading');
       const legend = document.getElementById('timetableBreakLegend');
-      const activeDays = ALL_DAYS.slice(0, state.daysCount);
+      const activeDays = getActiveDays();
       const dailySlots = getDailySlots();
 
       legend.innerHTML = state.breaks.map((b, idx) => {
@@ -1993,7 +2009,7 @@
 
       } else if (state.viewMode === 'master') {
         const dIdx = state.selectedDayIndex;
-        const dayName = ALL_DAYS[dIdx] || 'Monday';
+        const dayName = getActiveDays()[dIdx] || getActiveDays()[0];
         heading.textContent = `Master School Timetable — ${dayName} (All ${state.classes.length} Classes)`;
         subheading.textContent = `Every column is verified to have unique teachers across all ${state.classes.length} classes`;
 
@@ -2356,7 +2372,7 @@
     // =========================================================================
     function exportCurrentTimetableCsv() {
       const rows = [];
-      const activeDays = ALL_DAYS.slice(0, state.daysCount);
+      const activeDays = getActiveDays();
       const dailySlots = getDailySlots();
 
       const headers = ['Class', 'Standard', 'Section', 'Day', ...dailySlots.map(s => s.type === 'break' ? `${s.label} (${s.sub})` : s.label)];
@@ -2400,6 +2416,7 @@
         app: 'Timetable Maker',
         version: 4,
         exportedAt: new Date().toISOString(),
+        weekPattern: state.weekPattern,
         daysCount: state.daysCount,
         periodsPerDay: state.periodsPerDay,
         teacherTargetQuota: state.teacherTargetQuota,
@@ -2465,7 +2482,10 @@
         if (parsed.teacherTargetQuota >= 1 && parsed.teacherTargetQuota <= 60) {
           state.teacherTargetQuota = Number(parsed.teacherTargetQuota);
         }
-        if (parsed.daysCount === 5 || parsed.daysCount === 6) {
+        if (parsed.weekPattern && WEEK_PATTERNS[parsed.weekPattern]) {
+          state.weekPattern = parsed.weekPattern;
+          state.daysCount = WEEK_PATTERNS[parsed.weekPattern].length;
+        } else if (parsed.daysCount === 5 || parsed.daysCount === 6) {
           state.daysCount = Number(parsed.daysCount);
         }
 
@@ -2480,7 +2500,7 @@
             periodsPerWeek: Math.max(1, Number(a.periodsPerWeek) || 1)
           }));
 
-        document.getElementById('selectWeekDays').value = String(state.daysCount);
+        document.getElementById('selectWeekDays').value = String(state.weekPattern);
         document.getElementById('inputPeriodsPerWeek').value = String(state.teacherTargetQuota);
         document.getElementById('inputGlobalTeacherQuota').value = String(state.teacherTargetQuota);
 
@@ -2573,11 +2593,13 @@
       });
 
       document.getElementById('selectWeekDays').addEventListener('change', (e) => {
-        state.daysCount = Number(e.target.value) === 6 ? 6 : 5;
+        const val = e.target.value;
+        state.weekPattern = WEEK_PATTERNS[val] ? val : 'sun_thu';
+        state.daysCount = getActiveDays().length;
         saveState();
         generateTimetable();
         renderAll();
-        showToast(`Updated school week to ${state.daysCount} days.`);
+        showToast(`Updated school week to ${getActiveDays()[0]} – ${getActiveDays()[getActiveDays().length - 1]}.`);
       });
 
       document.getElementById('classPillsBar').addEventListener('click', (e) => {
@@ -3052,7 +3074,7 @@
 
     function bootApp() {
       loadSavedState();
-      document.getElementById('selectWeekDays').value = String(state.daysCount);
+      document.getElementById('selectWeekDays').value = String(state.weekPattern);
       document.getElementById('inputPeriodsPerWeek').value = String(state.teacherTargetQuota);
       document.getElementById('inputGlobalTeacherQuota').value = String(state.teacherTargetQuota);
       generateTimetable();
