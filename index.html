@@ -1,0 +1,3070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Timetable Maker — Clash-Free School Schedule</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* =====================================================================
+       COMPLETE SELF-CONTAINED CSS DESIGN SYSTEM
+       Works 100% independently of external CDNs across all screen sizes.
+       ===================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+    .hidden {
+      display: none !important;
+    }
+    .sr-only {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+
+    /* App Shell & Containers */
+    .app-header {
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+    }
+    .app-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 16px;
+      width: 100%;
+    }
+    .app-main {
+      padding-top: 20px;
+      padding-bottom: 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      flex: 1;
+    }
+    .tab-section {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .header-inner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+    }
+    .brand-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #0f172a;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .brand-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0;
+      line-height: 1.25;
+    }
+    .brand-sub {
+      font-size: 12px;
+      color: #64748b;
+      margin: 2px 0 0 0;
+    }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #f1f5f9;
+      padding: 4px;
+      border-radius: 8px;
+      flex-wrap: wrap;
+    }
+    .nav-tab-btn {
+      padding: 6px 13px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      border: none;
+      background: transparent;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .nav-tab-btn:hover {
+      color: #0f172a;
+    }
+    .nav-tab-btn.active {
+      background: #ffffff;
+      color: #0f172a;
+      font-weight: 600;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+    }
+
+    /* Header Right Actions & Status Badge */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 11px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+      white-space: nowrap;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      display: inline-block;
+    }
+
+    /* Toast Notification */
+    .toast-banner {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      z-index: 50;
+      max-width: 380px;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 12px 16px;
+      border-radius: 10px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.25);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .toast-close-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 0 4px;
+    }
+    .toast-close-btn:hover {
+      color: #ffffff;
+    }
+    .json-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: rgba(15, 23, 42, 0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    /* Buttons & Form Controls */
+    button, input, select {
+      font-family: inherit;
+    }
+    .btn-primary {
+      background: #0f172a;
+      color: #ffffff;
+      border: 1px solid #0f172a;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      white-space: nowrap;
+    }
+    .btn-primary:hover {
+      background: #1e293b;
+    }
+    .btn-outline {
+      background: #ffffff;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .btn-outline:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+    .btn-danger-outline {
+      background: #ffffff;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .btn-danger-outline:hover {
+      background: #fef2f2;
+    }
+    .link-edit-btn {
+      background: none;
+      border: none;
+      color: #2563eb;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0;
+    }
+    .link-edit-btn:hover {
+      text-decoration: underline;
+    }
+    .form-input, .form-select {
+      width: 100%;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 13px;
+      color: #0f172a;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .form-input:focus, .form-select:focus {
+      border-color: #0f172a;
+      background: #ffffff;
+      box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.1);
+    }
+    .form-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+
+    /* Cards & Summary Strip */
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+    }
+    .stat-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 4px;
+    }
+    .stat-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .stat-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #64748b;
+    }
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.2;
+    }
+    .stat-sub {
+      font-size: 11px;
+      color: #64748b;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Timetable Grid Table Styling — Fluid 100% Width (Zero Horizontal Scrollbar) */
+    .table-scroll-wrapper {
+      width: 100%;
+      overflow: visible;
+    }
+    .timetable-table {
+      width: 100%;
+      max-width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      text-align: left;
+    }
+    .timetable-table th,
+    .timetable-table td {
+      border-bottom: 1px solid #e2e8f0;
+      border-right: 1px solid #e2e8f0;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+    .timetable-table th:last-child,
+    .timetable-table td:last-child {
+      border-right: none;
+    }
+    .timetable-table thead th {
+      background: #f8fafc;
+      font-size: 10.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      color: #475569;
+      padding: 8px 4px;
+      text-align: center;
+      line-height: 1.2;
+    }
+    .timetable-table thead th.col-sticky-first {
+      text-align: left;
+      padding-left: 10px;
+      background: #f1f5f9;
+      width: 9.5%;
+    }
+    .timetable-table tbody td.col-day-cell {
+      padding: 8px 10px;
+      font-weight: 600;
+      font-size: 12px;
+      color: #0f172a;
+      background: #f8fafc;
+      vertical-align: middle;
+      width: 9.5%;
+    }
+    .timetable-table tbody td.col-period-cell {
+      padding: 4px;
+      vertical-align: top;
+      background: #ffffff;
+    }
+    .timetable-table tbody td.col-break-amber {
+      padding: 4px 3px;
+      width: 6.2%;
+      background: #fffbeb;
+      color: #92400e;
+      text-align: center;
+      vertical-align: middle;
+      font-size: 10px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+    .timetable-table tbody td.col-break-emerald {
+      padding: 4px 3px;
+      width: 6.5%;
+      background: #ecfdf5;
+      color: #065f46;
+      text-align: center;
+      vertical-align: middle;
+      font-size: 10px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+    .period-slot-card {
+      border-radius: 6px;
+      padding: 6px 6px;
+      border: 1px solid transparent;
+      min-height: 58px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 3px;
+    }
+    .period-slot-subject {
+      font-weight: 600;
+      font-size: 11px;
+      line-height: 1.2;
+      word-break: break-word;
+    }
+    .period-slot-teacher {
+      font-size: 10px;
+      opacity: 0.88;
+      font-weight: 500;
+      line-height: 1.15;
+      word-break: break-word;
+    }
+    .period-slot-free {
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #cbd5e1;
+      font-size: 10.5px;
+      text-align: center;
+    }
+
+    /* Subject Color Themes */
+    .subj-blue { background-color: #eff6ff; border-color: #bfdbfe; color: #1e3a8a; }
+    .subj-indigo { background-color: #eef2ff; border-color: #c7d2fe; color: #312e81; }
+    .subj-violet { background-color: #f5f3ff; border-color: #ddd6fe; color: #4c1d95; }
+    .subj-sky { background-color: #f0f9ff; border-color: #bae6fd; color: #0c4a6e; }
+    .subj-teal { background-color: #f0fdfa; border-color: #99f6e4; color: #134e4a; }
+    .subj-rose { background-color: #fff1f2; border-color: #fecdd3; color: #881337; }
+    .subj-orange { background-color: #fff7ed; border-color: #fed7aa; color: #7c2d12; }
+    .subj-cyan { background-color: #ecfeff; border-color: #a5f3fc; color: #164e63; }
+
+    /* Class Pills & Selection Checkboxes */
+    .class-pill-btn {
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .class-pill-btn:hover {
+      background: #f1f5f9;
+    }
+    .class-pill-btn.active {
+      background: #0f172a;
+      color: #ffffff;
+      border-color: #0f172a;
+    }
+
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+      gap: 6px;
+      max-height: 240px;
+      overflow-y: auto;
+      padding: 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+    }
+    .class-check-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      color: #1e293b;
+      font-size: 12px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.12s ease;
+    }
+    .class-check-item:hover {
+      background: #f1f5f9;
+    }
+    .class-check-item.checked {
+      background: #0f172a;
+      color: #ffffff;
+      border-color: #0f172a;
+    }
+    .check-box-icon {
+      width: 15px;
+      height: 15px;
+      border-radius: 4px;
+      border: 1px solid #cbd5e1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .class-check-item.checked .check-box-icon {
+      background: #ffffff;
+      color: #0f172a;
+      border-color: #ffffff;
+    }
+
+    /* Two-Column Workspace Layouts */
+    .workspace-split {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (min-width: 1024px) {
+      .workspace-split-teachers {
+        grid-template-columns: 5fr 7fr;
+      }
+      .workspace-split-equal {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* Standard Data Tables (Roster & Classes Config) */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+    .data-table th {
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 10px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #64748b;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+    .data-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+    .data-table tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    /* Break Editor Row */
+    .break-editor-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 80px auto;
+      gap: 8px;
+      align-items: end;
+      padding: 10px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+    }
+    @media (max-width: 640px) {
+      .break-editor-row {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .timetable-table thead th.th-break-col {
+      width: 6.4%;
+    }
+
+    @page {
+      size: A4 landscape;
+      margin: 8mm;
+    }
+
+    @media print {
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        scrollbar-width: none !important;
+      }
+      *::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      html, body {
+        background-color: #ffffff !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        min-height: 0 !important;
+        display: block !important;
+      }
+      .app-container,
+      .app-main,
+      .tab-section {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        display: block !important;
+      }
+      #viewTeachers,
+      #viewAudit {
+        display: none !important;
+      }
+      #viewSchedule {
+        display: block !important;
+        width: 100% !important;
+      }
+      .card,
+      .print-container {
+        box-shadow: none !important;
+        border: 1px solid #94a3b8 !important;
+        border-radius: 6px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: visible !important;
+      }
+      .table-scroll-wrapper {
+        overflow: visible !important;
+        overflow-x: visible !important;
+        overflow-y: visible !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      .timetable-table {
+        table-layout: fixed !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        border-collapse: collapse !important;
+      }
+      .timetable-table th,
+      .timetable-table td,
+      .timetable-table thead th.col-sticky-first,
+      .timetable-table thead th.th-break-col,
+      .timetable-table tbody td.col-day-cell,
+      .timetable-table tbody td.col-period-cell,
+      .timetable-table tbody td.col-break-amber,
+      .timetable-table tbody td.col-break-emerald {
+        min-width: 0 !important;
+        max-width: none !important;
+        width: auto !important;
+        padding: 4px 4px !important;
+        font-size: 9.5px !important;
+        line-height: 1.25 !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+        overflow-wrap: anywhere !important;
+        border: 1px solid #cbd5e1 !important;
+      }
+      .timetable-table thead th.col-sticky-first,
+      .timetable-table tbody td.col-day-cell {
+        width: 9% !important;
+        padding-left: 6px !important;
+      }
+      .timetable-table thead th.th-break-col,
+      .timetable-table tbody td.col-break-amber,
+      .timetable-table tbody td.col-break-emerald {
+        width: 6.2% !important;
+        font-size: 8.5px !important;
+      }
+      .period-slot-card {
+        min-height: 44px !important;
+        padding: 4px 5px !important;
+        gap: 2px !important;
+        border-radius: 4px !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+      .period-slot-subject {
+        font-size: 9.5px !important;
+        line-height: 1.2 !important;
+      }
+      .period-slot-teacher {
+        font-size: 8.5px !important;
+        line-height: 1.15 !important;
+      }
+      .period-slot-free {
+        min-height: 44px !important;
+        font-size: 9px !important;
+      }
+      .timetable-table tr {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="app-header no-print">
+    <div class="app-container header-inner">
+      <div class="brand-box">
+        <div class="brand-logo">TM</div>
+        <div>
+          <h1 class="brand-title">Timetable Maker</h1>
+          <p id="headerSubtitle" class="brand-sub">19 Classes • 8 Periods &amp; 2 Breaks • Editable Quotas &amp; Structure</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="nav-tabs" aria-label="Main Tabs">
+        <button id="tabBtnSchedule" type="button" class="nav-tab-btn active">
+          Timetable Grid
+        </button>
+        <button id="tabBtnTeachers" type="button" class="nav-tab-btn">
+          Teachers &amp; Assignments
+        </button>
+        <button id="tabBtnAudit" type="button" class="nav-tab-btn">
+          Clash Audit &amp; Structure
+        </button>
+      </nav>
+
+      <!-- Action Buttons -->
+      <div class="header-actions" style="flex-wrap:wrap;">
+        <span id="clashStatusBadge" class="status-pill">
+          <span class="status-dot"></span>
+          0 Clashes
+        </span>
+        <button id="btnExportJson" type="button" class="btn-outline" title="Download full school configuration & assignments as a JSON backup file">
+          Export JSON
+        </button>
+        <button id="btnImportJson" type="button" class="btn-outline" title="Load school configuration & assignments from a JSON backup file">
+          Import JSON
+        </button>
+        <button id="btnOpenJsonModal" type="button" class="btn-outline" title="Copy or paste raw JSON backup data">
+          JSON Copy/Paste
+        </button>
+        <input id="inputImportJsonFile" type="file" accept=".json,application/json" class="sr-only" />
+        <button id="btnRegenerate" type="button" class="btn-primary">
+          Generate Timetable
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Toast Banner -->
+  <div id="toastBanner" class="toast-banner hidden no-print">
+    <span id="toastMessage">Action completed.</span>
+    <button id="btnCloseToast" type="button" class="toast-close-btn">✕</button>
+  </div>
+
+  <!-- JSON Backup Copy / Paste Modal -->
+  <div id="jsonBackupModal" class="json-modal-backdrop hidden no-print">
+    <div class="card" style="max-width:640px; width:100%; padding:20px; display:flex; flex-direction:column; gap:14px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #e2e8f0; padding-bottom:10px;">
+        <div>
+          <h3 style="font-size:16px; font-weight:700; color:#0f172a; margin:0;">JSON Backup — Copy, Paste &amp; Restore</h3>
+          <p style="font-size:12px; color:#64748b; margin:2px 0 0 0;">Save or transfer your entire school structure, classes, breaks, and teacher assignments without a database.</p>
+        </div>
+        <button id="btnCloseJsonModal" type="button" class="btn-outline" style="padding:4px 10px;">✕</button>
+      </div>
+      <div>
+        <label for="textareaJsonBackup" class="form-label">School State JSON Data</label>
+        <textarea id="textareaJsonBackup" rows="10" class="form-input" style="font-family:monospace; font-size:11.5px; line-height:1.4; background:#f8fafc; resize:vertical;"></textarea>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px;">
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <button id="btnCopyJsonClipboard" type="button" class="btn-outline">Copy JSON to Clipboard</button>
+          <button id="btnDownloadJsonFromModal" type="button" class="btn-outline">Download .json File</button>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <button id="btnApplyPastedJson" type="button" class="btn-primary">Import &amp; Apply Pasted JSON</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Container -->
+  <main class="app-container app-main">
+
+    <!-- Quick Summary Strip -->
+    <section class="stats-grid no-print">
+      <div class="stat-card">
+        <div class="stat-top">
+          <span class="stat-label">Total School Classes</span>
+          <button id="btnQuickEditClasses" type="button" class="link-edit-btn">Edit</button>
+        </div>
+        <div class="stat-value" id="statTotalClasses">19</div>
+        <div class="stat-sub" id="statClassesBreakdown">1 Mixed • 8 Boys • 10 Girls</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-top">
+          <span class="stat-label">Daily Schedule</span>
+          <button id="btnQuickEditSchedule" type="button" class="link-edit-btn">Edit</button>
+        </div>
+        <div class="stat-value" id="statDailyPeriods">8 Periods</div>
+        <div class="stat-sub" id="statDailyBreaks">Break 1 &gt; P2 • Break 2 &gt; P7</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-top">
+          <span class="stat-label">Teacher Quota / Wk</span>
+          <button id="btnQuickEditTeachers" type="button" class="link-edit-btn">Edit</button>
+        </div>
+        <div class="stat-value" id="statTeacherQuotaLabel">24 Periods</div>
+        <div class="stat-sub" id="statTotalTeachers" style="color:#047857; font-weight:600;">0 Teachers</div>
+        <span id="statTotalAssignments" class="sr-only">0</span>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-top">
+          <span class="stat-label">Scheduled Periods / Week</span>
+        </div>
+        <div class="stat-value" id="statScheduledSlots">0</div>
+        <div class="stat-sub" id="statUnplacedCount" style="color:#059669; font-weight:600;">100% Clash-Free</div>
+      </div>
+    </section>
+
+    <!-- TAB 1: TIMETABLE GRID VIEW -->
+    <section id="viewSchedule" class="tab-section">
+      <!-- Controls Bar -->
+      <div class="card no-print" style="padding:16px; display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:16px;">
+        <div style="display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px;">
+          <!-- View Mode Selector -->
+          <div style="min-width:210px;">
+            <label for="selectViewMode" class="form-label">View Mode</label>
+            <select id="selectViewMode" class="form-select">
+              <option value="class">By Class (Weekly Timetable)</option>
+              <option value="teacher">By Teacher (Weekly Schedule)</option>
+              <option value="master">Master Day Grid (All Classes)</option>
+            </select>
+          </div>
+
+          <!-- Class Picker (shown when View Mode = class) -->
+          <div id="wrapperSelectClass" style="min-width:170px;">
+            <label for="selectClassTarget" class="form-label">Select Class</label>
+            <select id="selectClassTarget" class="form-select"></select>
+          </div>
+
+          <!-- Teacher Picker (shown when View Mode = teacher) -->
+          <div id="wrapperSelectTeacher" class="hidden" style="min-width:220px;">
+            <label for="selectTeacherTarget" class="form-label">Select Teacher</label>
+            <select id="selectTeacherTarget" class="form-select"></select>
+          </div>
+
+          <!-- Day Picker (shown when View Mode = master) -->
+          <div id="wrapperSelectDay" class="hidden" style="min-width:150px;">
+            <label for="selectDayTarget" class="form-label">Select Day</label>
+            <select id="selectDayTarget" class="form-select"></select>
+          </div>
+
+          <!-- Working Days Selector -->
+          <div style="min-width:155px;">
+            <label for="selectWeekDays" class="form-label">School Week</label>
+            <select id="selectWeekDays" class="form-select">
+              <option value="5">5 Days (Mon – Fri)</option>
+              <option value="6">6 Days (Mon – Sat)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Right Controls: Quick Add, Edit Structure, Export, Print -->
+        <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
+          <button id="btnJumpToAdd" type="button" class="btn-outline">
+            + Add Teacher / Subject
+          </button>
+          <button id="btnJumpToStructure" type="button" class="btn-outline">
+            Edit Classes &amp; Periods
+          </button>
+          <button id="btnExportCsv" type="button" class="btn-outline">
+            Export CSV
+          </button>
+          <button id="btnPrint" type="button" class="btn-outline">
+            Print View
+          </button>
+        </div>
+      </div>
+
+      <!-- Class Quick-Switcher Pills (only in Class mode) -->
+      <div id="classPillsBar" class="card no-print" style="padding:12px; display:flex; flex-wrap:wrap; align-items:center; gap:6px;"></div>
+
+      <!-- Timetable Card -->
+      <div class="card print-container" style="overflow:hidden;">
+        <div style="padding:16px 20px; border-bottom:1px solid #e2e8f0; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px;">
+          <div>
+            <h2 id="timetableHeading" style="font-size:16px; font-weight:700; color:#0f172a; margin:0;">KG-1 (Mixed) — Weekly Timetable</h2>
+            <p id="timetableSubheading" style="font-size:12px; color:#64748b; margin:2px 0 0 0;">8 periods per day • First Break after Period 2 • Second Break (Salah) after Period 7</p>
+          </div>
+          <div id="timetableBreakLegend" style="display:flex; flex-wrap:wrap; align-items:center; gap:12px; font-size:12px; color:#475569;"></div>
+        </div>
+
+        <div class="table-scroll-wrapper">
+          <table class="timetable-table">
+            <thead id="timetableThead"></thead>
+            <tbody id="timetableTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: TEACHERS & ASSIGNMENTS (EDITABLE TEACHER PERIODS PER WEEK) -->
+    <section id="viewTeachers" class="tab-section hidden">
+
+      <!-- Global Default Teacher Quota Settings Bar -->
+      <div class="card" style="padding:16px 20px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px;">
+        <div>
+          <h3 style="font-size:14px; font-weight:700; color:#0f172a; margin:0;">Teacher Weekly Periods Configuration</h3>
+          <p style="font-size:12px; color:#64748b; margin:2px 0 0 0;">Set the default weekly period target per teacher or edit any individual assignment's periods directly in the table below.</p>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; align-items:center; gap:10px;">
+          <label for="inputGlobalTeacherQuota" style="font-size:12px; font-weight:600; color:#334155;">Target Periods / Teacher:</label>
+          <input id="inputGlobalTeacherQuota" type="number" min="1" max="60" value="24" class="form-input" style="width:80px; font-weight:700; text-align:center;" />
+          <button id="btnRebalanceAllTeachers" type="button" class="btn-primary">
+            Apply Target to All Teachers
+          </button>
+        </div>
+      </div>
+
+      <div class="workspace-split workspace-split-teachers">
+
+        <!-- Left Column: Add Teacher / Subject / Classes Form -->
+        <div class="card" style="padding:20px; display:flex; flex-direction:column; gap:16px;">
+          <div style="border-bottom:1px solid #f1f5f9; padding-bottom:12px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+              <h2 style="font-size:16px; font-weight:700; color:#0f172a; margin:0;">Add / Update Teacher Assignment</h2>
+              <span id="formQuotaBadge" style="padding:2px 8px; border-radius:6px; font-size:11px; font-weight:600; background:#f1f5f9; color:#1e293b;">Editable Quota</span>
+            </div>
+            <p style="font-size:12px; color:#64748b; margin:4px 0 0 0;">Enter teacher name, subject, classes, and customize their weekly periods.</p>
+          </div>
+
+          <form id="formAddAssignment" style="display:flex; flex-direction:column; gap:14px;">
+            <div>
+              <label for="inputTeacherName" class="form-label">Teacher Name *</label>
+              <input id="inputTeacherName" type="text" required placeholder="Enter teacher name" class="form-input" list="existingTeachersDatalist" />
+              <datalist id="existingTeachersDatalist"></datalist>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 2fr 1fr; gap:12px;">
+              <div>
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
+                  <label for="inputSubjectName" class="form-label" style="margin:0;">Subjects (Select or Type Multiple) *</label>
+                  <span id="selectedSubjectCountLabel" style="font-size:11px; font-weight:600; color:#047857;">0 selected</span>
+                </div>
+                <div style="display:flex; gap:6px;">
+                  <input id="inputSubjectName" type="text" placeholder="Enter subject(s), comma-separated" class="form-input" list="subjectsDatalist" />
+                  <button id="btnAddCustomSubject" type="button" class="btn-outline" style="padding:6px 10px;" title="Add typed subject to multi-select list">+ Add</button>
+                </div>
+                <datalist id="subjectsDatalist">
+                  <option value="Mathematics"></option>
+                  <option value="English"></option>
+                  <option value="Science"></option>
+                  <option value="Islamic Studies"></option>
+                  <option value="Urdu"></option>
+                  <option value="Arabic"></option>
+                  <option value="Social Studies"></option>
+                  <option value="Computer Science"></option>
+                  <option value="General Knowledge"></option>
+                  <option value="Hindi"></option>
+                  <option value="Art &amp; Activity"></option>
+                </datalist>
+              </div>
+
+              <div>
+                <label for="inputPeriodsPerWeek" class="form-label">Periods / Wk *</label>
+                <input id="inputPeriodsPerWeek" type="number" min="1" max="60" value="24" required class="form-input" style="font-weight:700;" />
+              </div>
+            </div>
+
+            <!-- Multi-Subject Quick Selection Pills -->
+            <div>
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+                <span style="font-size:11px; color:#64748b; font-weight:500;">Click multiple subjects below to assign to this teacher:</span>
+                <button id="btnClearSubjects" type="button" class="link-edit-btn" style="font-size:11px; color:#64748b;">Clear Subjects</button>
+              </div>
+              <div id="multiSubjectPillsGrid" style="display:flex; flex-wrap:wrap; gap:6px; padding:8px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px;"></div>
+            </div>
+
+            <!-- How to apply Periods / Wk -->
+            <div>
+              <label for="selectPeriodAllocationMode" class="form-label">Period Allocation Mode</label>
+              <select id="selectPeriodAllocationMode" class="form-select">
+                <option value="total_teacher">Total Weekly Periods for this Teacher (Split across selected classes)</option>
+                <option value="per_class">Periods per Selected Class (Assign this exact count to each class)</option>
+              </select>
+            </div>
+
+            <!-- Live Period Distribution Preview Box -->
+            <div id="quotaPreviewBox" style="padding:12px; border-radius:8px; background:#f8fafc; border:1px solid #e2e8f0; font-size:12px; color:#334155;"></div>
+
+            <!-- Class Selection Grid -->
+            <div>
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+                <label class="form-label" style="margin:0;">Select Classes for this Teacher *</label>
+                <span id="selectedClassCountLabel" style="font-size:11px; font-weight:500; color:#64748b;">0 selected</span>
+              </div>
+
+              <!-- Quick group filters -->
+              <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;">
+                <button type="button" data-select-group="kg" class="btn-class-group btn-outline" style="padding:4px 8px; font-size:11px;">KG-1 to KG-3 (5)</button>
+                <button type="button" data-select-group="primary" class="btn-class-group btn-outline" style="padding:4px 8px; font-size:11px;">Std 1–5 (10)</button>
+                <button type="button" data-select-group="middle" class="btn-class-group btn-outline" style="padding:4px 8px; font-size:11px;">Std 6–8 (4)</button>
+                <button type="button" data-select-group="boys" class="btn-class-group btn-outline" style="padding:4px 8px; font-size:11px; color:#1d4ed8; border-color:#bfdbfe; background:#eff6ff;">Boys Classes (8)</button>
+                <button type="button" data-select-group="girls" class="btn-class-group btn-outline" style="padding:4px 8px; font-size:11px; color:#be185d; border-color:#fbcfe8; background:#fdf2f8;">Girls Classes (10)</button>
+                <button type="button" data-select-group="clear" class="btn-class-group btn-outline" style="padding:4px 8px; font-size:11px;">Clear</button>
+              </div>
+
+              <div id="checkboxClassesGrid" class="checkbox-grid"></div>
+            </div>
+
+            <div id="formFeedbackBox" class="hidden" style="padding:10px 12px; border-radius:8px; font-size:12px; font-weight:500;"></div>
+
+            <button type="submit" class="btn-primary" style="width:100%; padding:10px 16px; font-size:14px; font-weight:600;">
+              Add Assignment &amp; Update Timetable
+            </button>
+          </form>
+        </div>
+
+        <!-- Right Column: Current Assignments List (with inline editable periods) -->
+        <div class="card" style="overflow:hidden;">
+          <div style="padding:16px 20px; border-bottom:1px solid #e2e8f0; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px;">
+            <div>
+              <h2 style="font-size:16px; font-weight:700; color:#0f172a; margin:0;">Teacher &amp; Subject Roster (Editable Periods / Wk)</h2>
+              <p style="font-size:12px; color:#64748b; margin:2px 0 0 0;">Edit any assignment's weekly periods directly in the table below</p>
+            </div>
+
+            <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
+              <input id="inputFilterRoster" type="text" placeholder="Filter teacher, subject, class..." class="form-input" style="width:200px; padding:6px 10px; font-size:12px;" />
+              <button id="btnLoadSample" type="button" class="btn-outline">
+                Reset Sample Data
+              </button>
+              <button id="btnClearAll" type="button" class="btn-danger-outline">
+                Clear All
+              </button>
+            </div>
+          </div>
+
+          <!-- Teacher Load Summary Pills -->
+          <div id="teacherLoadBar" style="padding:12px 16px; background:#f8fafc; border-bottom:1px solid #e2e8f0; display:flex; flex-wrap:wrap; gap:6px; max-height:115px; overflow-y:auto;"></div>
+
+          <!-- Assignments Table -->
+          <div style="overflow-x:auto; max-height:480px; overflow-y:auto;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Teacher (Total Load)</th>
+                  <th>Subject</th>
+                  <th>Class</th>
+                  <th style="text-align:center;">Periods / Wk</th>
+                  <th style="text-align:right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="rosterTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 3: CLASH AUDIT & EDITABLE SCHOOL STRUCTURE -->
+    <section id="viewAudit" class="tab-section hidden">
+      <!-- Top Audit Banner -->
+      <div class="card" style="padding:20px; display:flex; flex-direction:column; gap:12px;">
+        <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; border-bottom:1px solid #f1f5f9; padding-bottom:12px;">
+          <div>
+            <h2 style="font-size:16px; font-weight:700; color:#0f172a; margin:0;">Clash Detection &amp; Workload Audit Report</h2>
+            <p style="font-size:12px; color:#64748b; margin:2px 0 0 0;">Real-time verification across all configured classes, periods, and teachers</p>
+          </div>
+          <span id="auditBadge" class="status-pill">
+            Verified Clash-Free
+          </span>
+        </div>
+        <div id="auditDetailsContainer" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:12px;"></div>
+      </div>
+
+      <div class="workspace-split workspace-split-equal">
+
+        <!-- Left Column: Editable Daily Period & Break Structure -->
+        <div class="card" style="padding:20px; display:flex; flex-direction:column; gap:16px;">
+          <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; border-bottom:1px solid #f1f5f9; padding-bottom:12px;">
+            <div>
+              <h2 style="font-size:16px; font-weight:700; color:#0f172a; margin:0;">Daily Period &amp; Break Structure (Editable)</h2>
+              <p style="font-size:12px; color:#64748b; margin:2px 0 0 0;">Customize daily teaching periods and break positions/labels</p>
+            </div>
+            <button id="btnResetScheduleStructure" type="button" class="btn-outline">
+              Reset Default (8P + 2 Breaks)
+            </button>
+          </div>
+
+          <!-- Total Teaching Periods Per Day Control -->
+          <div style="padding:14px; border-radius:8px; background:#f8fafc; border:1px solid #e2e8f0; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px;">
+            <div>
+              <label for="inputPeriodsPerDay" style="display:block; font-size:13px; font-weight:700; color:#0f172a;">Teaching Periods Per Day</label>
+              <p style="font-size:11px; color:#64748b; margin:2px 0 0 0;">Adjust total teaching periods per day (1 to 12)</p>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <input id="inputPeriodsPerDay" type="number" min="1" max="12" value="8" class="form-input" style="width:76px; background:#ffffff; font-weight:700; text-align:center;" />
+              <span style="font-size:12px; color:#475569; font-weight:500;">Periods / Day</span>
+            </div>
+          </div>
+
+          <!-- Breaks Configuration List -->
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <h3 class="form-label" style="margin:0;">Configured Breaks</h3>
+              <span style="font-size:11px; color:#94a3b8;">Edit name, subtitle, or period position</span>
+            </div>
+            <div id="breaksEditorList" style="display:flex; flex-direction:column; gap:8px;"></div>
+          </div>
+
+          <!-- Add New Break Form -->
+          <form id="formAddBreak" style="padding:12px; border-radius:8px; background:#f8fafc; border:1px solid #e2e8f0; display:flex; flex-direction:column; gap:10px;">
+            <div style="font-size:12px; font-weight:600; color:#334155;">Add New Break</div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr 110px; gap:8px;">
+              <input id="inputNewBreakLabel" type="text" required placeholder="Enter break name" class="form-input" style="background:#ffffff; font-size:12px;" />
+              <input id="inputNewBreakSub" type="text" placeholder="Enter subtitle" class="form-input" style="background:#ffffff; font-size:12px;" />
+              <div style="display:flex; align-items:center; gap:6px;">
+                <label for="inputNewBreakAfter" style="font-size:11px; color:#475569; white-space:nowrap;">After P#:</label>
+                <input id="inputNewBreakAfter" type="number" min="1" max="12" value="4" required class="form-input" style="background:#ffffff; font-size:12px; font-weight:700; text-align:center; padding:6px;" />
+              </div>
+            </div>
+            <button type="submit" class="btn-primary" style="width:100%;">
+              + Add Break to Daily Schedule
+            </button>
+          </form>
+
+          <!-- Live Daily Sequence Preview -->
+          <div style="padding-top:8px; border-top:1px solid #f1f5f9;">
+            <h3 class="form-label" style="margin-bottom:8px;">Live Daily Sequence Preview</h3>
+            <ol id="liveDailySequenceList" style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:6px; max-height:240px; overflow-y:auto; font-size:12px;"></ol>
+          </div>
+        </div>
+
+        <!-- Right Column: Editable School Classes Configuration -->
+        <div class="card" style="padding:20px; display:flex; flex-direction:column; gap:16px;">
+          <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; border-bottom:1px solid #f1f5f9; padding-bottom:12px;">
+            <div>
+              <h2 style="font-size:16px; font-weight:700; color:#0f172a; margin:0;">School Classes Configuration (Editable)</h2>
+              <p style="font-size:12px; color:#64748b; margin:2px 0 0 0;">Add, rename, change section type, or remove any class</p>
+            </div>
+            <button id="btnResetClasses" type="button" class="btn-outline">
+              Reset Default 19 Classes
+            </button>
+          </div>
+
+          <!-- Add New Class Form -->
+          <form id="formAddClass" style="padding:12px; border-radius:8px; background:#f8fafc; border:1px solid #e2e8f0; display:flex; flex-direction:column; gap:10px;">
+            <div style="font-size:12px; font-weight:600; color:#334155;">Add New Class / Section</div>
+            <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:8px;">
+              <input id="inputNewClassName" type="text" required placeholder="Enter class name" class="form-input" style="background:#ffffff; font-size:12px;" />
+              <input id="inputNewClassStd" type="text" required placeholder="Enter standard" class="form-input" style="background:#ffffff; font-size:12px;" />
+              <select id="selectNewClassSection" class="form-select" style="background:#ffffff; font-size:12px;">
+                <option value="Mixed">Mixed</option>
+                <option value="Boys">Boys</option>
+                <option value="Girls">Girls</option>
+                <option value="Girls Only">Girls Only</option>
+              </select>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <label for="selectNewClassGroup" style="font-size:11px; color:#475569; font-weight:500;">Wing/Group:</label>
+                <select id="selectNewClassGroup" class="form-select" style="width:auto; background:#ffffff; font-size:12px; padding:5px 10px;">
+                  <option value="kg">KG / Pre-Primary</option>
+                  <option value="primary">Primary (Std 1–5)</option>
+                  <option value="middle">Middle / Senior (Std 6+)</option>
+                </select>
+              </div>
+              <button type="submit" class="btn-primary">
+                + Add Class
+              </button>
+            </div>
+          </form>
+
+          <!-- Editable Classes Table -->
+          <div style="overflow-x:auto; max-height:420px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="min-width:140px;">Class Name</th>
+                  <th style="min-width:85px;">Standard</th>
+                  <th style="min-width:110px;">Section Type</th>
+                  <th style="text-align:right;">Assigned</th>
+                  <th style="text-align:right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="classesAuditBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // =========================================================================
+    // 1. DEFAULT SCHOOL STRUCTURE (19 Classes, 8 Periods + 2 Breaks, 24p Quota)
+    // =========================================================================
+    function getDefaultClasses() {
+      return [
+        { id: 'KG1-M', name: 'KG-1 (Mixed)', std: 'KG-1', section: 'Mixed', group: 'kg' },
+        { id: 'KG2-B', name: 'KG-2 (Boys)', std: 'KG-2', section: 'Boys', group: 'kg' },
+        { id: 'KG2-G', name: 'KG-2 (Girls)', std: 'KG-2', section: 'Girls', group: 'kg' },
+        { id: 'KG3-B', name: 'KG-3 (Boys)', std: 'KG-3', section: 'Boys', group: 'kg' },
+        { id: 'KG3-G', name: 'KG-3 (Girls)', std: 'KG-3', section: 'Girls', group: 'kg' },
+        { id: 'STD1-B', name: 'Std 1 (Boys)', std: 'Std 1', section: 'Boys', group: 'primary' },
+        { id: 'STD1-G', name: 'Std 1 (Girls)', std: 'Std 1', section: 'Girls', group: 'primary' },
+        { id: 'STD2-B', name: 'Std 2 (Boys)', std: 'Std 2', section: 'Boys', group: 'primary' },
+        { id: 'STD2-G', name: 'Std 2 (Girls)', std: 'Std 2', section: 'Girls', group: 'primary' },
+        { id: 'STD3-B', name: 'Std 3 (Boys)', std: 'Std 3', section: 'Boys', group: 'primary' },
+        { id: 'STD3-G', name: 'Std 3 (Girls)', std: 'Std 3', section: 'Girls', group: 'primary' },
+        { id: 'STD4-B', name: 'Std 4 (Boys)', std: 'Std 4', section: 'Boys', group: 'primary' },
+        { id: 'STD4-G', name: 'Std 4 (Girls)', std: 'Std 4', section: 'Girls', group: 'primary' },
+        { id: 'STD5-B', name: 'Std 5 (Boys)', std: 'Std 5', section: 'Boys', group: 'primary' },
+        { id: 'STD5-G', name: 'Std 5 (Girls)', std: 'Std 5', section: 'Girls', group: 'primary' },
+        { id: 'STD6-B', name: 'Std 6 (Boys)', std: 'Std 6', section: 'Boys', group: 'middle' },
+        { id: 'STD6-G', name: 'Std 6 (Girls)', std: 'Std 6', section: 'Girls', group: 'middle' },
+        { id: 'STD7-G', name: 'Std 7 (Girls)', std: 'Std 7', section: 'Girls Only', group: 'middle' },
+        { id: 'STD8-G', name: 'Std 8 (Girls)', std: 'Std 8', section: 'Girls Only', group: 'middle' }
+      ];
+    }
+
+    function getDefaultBreaks() {
+      return [
+        { id: 'brk_1', label: 'Break 1', sub: 'First Break', afterPeriod: 2, color: 'amber' },
+        { id: 'brk_2', label: 'Break 2', sub: 'Salah Break', afterPeriod: 7, color: 'emerald' }
+      ];
+    }
+
+    const ALL_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    function splitPeriodsAcrossClasses(totalPeriods, count) {
+      if (count <= 0) return [];
+      const total = Math.max(1, Number(totalPeriods) || 24);
+      const base = Math.floor(total / count);
+      const rem = total % count;
+      const shares = [];
+      for (let i = 0; i < count; i++) {
+        shares.push(Math.max(1, i < rem ? base + 1 : base));
+      }
+      return shares;
+    }
+
+    function rebalanceTeacherToQuota(assignmentsList, teacherName, targetTotal) {
+      const tKey = teacherName.trim().toLowerCase();
+      const teacherRows = assignmentsList.filter(a => a.teacher.trim().toLowerCase() === tKey);
+      if (teacherRows.length === 0) return;
+      const shares = splitPeriodsAcrossClasses(targetTotal, teacherRows.length);
+      teacherRows.forEach((row, idx) => {
+        row.periodsPerWeek = shares[idx];
+      });
+    }
+
+    function getDefaultAssignments() {
+      return [];
+    }
+
+    // =========================================================================
+    // 2. APPLICATION STATE
+    // =========================================================================
+    const state = {
+      activeTab: 'schedule',
+      viewMode: 'class',
+      selectedClassId: 'KG1-M',
+      selectedTeacher: '',
+      selectedDayIndex: 0,
+      daysCount: 5,
+      periodsPerDay: 8,
+      breaks: getDefaultBreaks(),
+      classes: getDefaultClasses(),
+      teacherTargetQuota: 24,
+      periodAllocationMode: 'total_teacher',
+      availableSubjects: [
+        'Mathematics', 'English', 'Science', 'Islamic Studies',
+        'Urdu', 'Arabic', 'Social Studies', 'Computer Science',
+        'General Knowledge', 'Hindi', 'Art & Activity', 'Physical Education'
+      ],
+      selectedFormSubjects: new Set(),
+      assignments: [],
+      selectedFormClassIds: new Set(['KG1-M', 'KG2-B', 'KG2-G', 'KG3-B']),
+      rosterFilter: '',
+      schedule: {},
+      unplacedPeriods: [],
+      clashList: []
+    };
+
+    function getDailySlots() {
+      const slots = [];
+      const sortedBreaks = [...state.breaks].sort((a, b) => a.afterPeriod - b.afterPeriod);
+      for (let p = 1; p <= state.periodsPerDay; p++) {
+        slots.push({
+          type: 'period',
+          periodNum: p,
+          label: `Period ${p}`,
+          sub: `Slot ${p}`
+        });
+        sortedBreaks
+          .filter(b => Number(b.afterPeriod) === p)
+          .forEach((b, idx) => {
+            slots.push({
+              type: 'break',
+              breakId: b.id,
+              periodNum: null,
+              afterPeriod: p,
+              label: b.label || 'Break',
+              sub: b.sub || `After P${p}`,
+              color: b.color || (idx % 2 === 0 ? 'amber' : 'emerald')
+            });
+          });
+      }
+      return slots;
+    }
+
+    function loadSavedState() {
+      try {
+        const raw = localStorage.getItem('timetable_maker_state_v5');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed.classes) && parsed.classes.length > 0) {
+            state.classes = parsed.classes;
+          }
+          if (Array.isArray(parsed.breaks)) {
+            state.breaks = parsed.breaks;
+          }
+          if (parsed.periodsPerDay >= 1 && parsed.periodsPerDay <= 12) {
+            state.periodsPerDay = Number(parsed.periodsPerDay);
+          }
+          if (parsed.teacherTargetQuota >= 1 && parsed.teacherTargetQuota <= 60) {
+            state.teacherTargetQuota = Number(parsed.teacherTargetQuota);
+          }
+          if (parsed.daysCount === 5 || parsed.daysCount === 6) {
+            state.daysCount = parsed.daysCount;
+          }
+          if (Array.isArray(parsed.assignments)) {
+            const validClassIds = new Set(state.classes.map(c => c.id));
+            state.assignments = parsed.assignments.filter(a => validClassIds.has(a.classId));
+            return;
+          }
+        }
+      } catch (err) {
+        // Ignore storage errors inside sandboxed iframes
+      }
+      state.assignments = getDefaultAssignments(state.teacherTargetQuota, state.classes);
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem('timetable_maker_state_v5', JSON.stringify({
+          classes: state.classes,
+          breaks: state.breaks,
+          periodsPerDay: state.periodsPerDay,
+          teacherTargetQuota: state.teacherTargetQuota,
+          assignments: state.assignments,
+          daysCount: state.daysCount
+        }));
+      } catch (err) {
+        // Ignore storage errors
+      }
+    }
+
+    // =========================================================================
+    // 3. CLASH-FREE TIMETABLE SOLVER (With Kempe-Chain Slot Augmentation)
+    // =========================================================================
+    function generateTimetable() {
+      const days = state.daysCount;
+      const periods = state.periodsPerDay;
+      const validClassIds = new Set(state.classes.map(c => c.id));
+
+      state.assignments = state.assignments.filter(a => validClassIds.has(a.classId));
+
+      const schedule = {};
+      state.classes.forEach(cls => {
+        schedule[cls.id] = {};
+        for (let d = 0; d < days; d++) {
+          schedule[cls.id][d] = {};
+          for (let p = 1; p <= periods; p++) {
+            schedule[cls.id][d][p] = null;
+          }
+        }
+      });
+
+      const teacherBusy = {};
+      const normTeacher = (t) => t.trim().toLowerCase();
+
+      const ensureTeacher = (tKey) => {
+        if (!teacherBusy[tKey]) {
+          teacherBusy[tKey] = {};
+          for (let d = 0; d < days; d++) {
+            teacherBusy[tKey][d] = {};
+          }
+        }
+      };
+
+      const teacherTotalLoad = {};
+      const classTotalLoad = {};
+      state.assignments.forEach(a => {
+        const tk = normTeacher(a.teacher);
+        teacherTotalLoad[tk] = (teacherTotalLoad[tk] || 0) + Number(a.periodsPerWeek);
+        classTotalLoad[a.classId] = (classTotalLoad[a.classId] || 0) + Number(a.periodsPerWeek);
+        ensureTeacher(tk);
+      });
+
+      const sortedAssignments = [...state.assignments].sort((a, b) => {
+        const tDiff = (teacherTotalLoad[normTeacher(b.teacher)] || 0) - (teacherTotalLoad[normTeacher(a.teacher)] || 0);
+        if (tDiff !== 0) return tDiff;
+        if (b.periodsPerWeek !== a.periodsPerWeek) return b.periodsPerWeek - a.periodsPerWeek;
+        return (classTotalLoad[b.classId] || 0) - (classTotalLoad[a.classId] || 0);
+      });
+
+      const unplaced = [];
+
+      function countOnDay(classId, d, assignmentId, subjectName) {
+        let count = 0;
+        for (let p = 1; p <= periods; p++) {
+          const cell = schedule[classId][d][p];
+          if (cell && (cell.assignmentId === assignmentId || cell.subject.toLowerCase() === subjectName.toLowerCase())) {
+            count++;
+          }
+        }
+        return count;
+      }
+
+      function countTeacherOnDay(tKey, d) {
+        let count = 0;
+        for (let p = 1; p <= periods; p++) {
+          if (teacherBusy[tKey][d][p]) count++;
+        }
+        return count;
+      }
+
+      function countClassDayLoad(classId, d) {
+        let count = 0;
+        for (let p = 1; p <= periods; p++) {
+          if (schedule[classId][d][p]) count++;
+        }
+        return count;
+      }
+
+      sortedAssignments.forEach((asg, asgIdx) => {
+        if (!schedule[asg.classId]) return;
+        const tKey = normTeacher(asg.teacher);
+        const maxWeeklyPerClass = days * periods;
+        const targetPeriods = Math.min(Math.max(1, Number(asg.periodsPerWeek) || 1), maxWeeklyPerClass);
+
+        for (let instance = 0; instance < targetPeriods; instance++) {
+          let placed = false;
+
+          const candidates = [];
+          for (let d = 0; d < days; d++) {
+            const sameSubjCount = countOnDay(asg.classId, d, asg.id, asg.subject);
+            const teacherDayCount = countTeacherOnDay(tKey, d);
+            const dayLoad = countClassDayLoad(asg.classId, d);
+            for (let p = 1; p <= periods; p++) {
+              const rotatedP = ((p + d * 2 + instance + asgIdx) % periods) + 1;
+              if (!schedule[asg.classId][d][rotatedP] && !teacherBusy[tKey][d][rotatedP]) {
+                const score = sameSubjCount * 120 + teacherDayCount * 15 + dayLoad * 6 + ((rotatedP + d) % periods);
+                candidates.push({ d, p: rotatedP, score });
+              }
+            }
+          }
+
+          if (candidates.length > 0) {
+            candidates.sort((x, y) => x.score - y.score);
+            const best = candidates[0];
+            schedule[asg.classId][best.d][best.p] = {
+              assignmentId: asg.id,
+              teacher: asg.teacher,
+              subject: asg.subject
+            };
+            teacherBusy[tKey][best.d][best.p] = asg.classId;
+            placed = true;
+          } else {
+            const freeTeacherSlots = [];
+            const freeClassSlots = [];
+            for (let d = 0; d < days; d++) {
+              for (let p = 1; p <= periods; p++) {
+                if (!teacherBusy[tKey][d][p]) freeTeacherSlots.push({ d, p });
+                if (!schedule[asg.classId][d][p]) freeClassSlots.push({ d, p });
+              }
+            }
+
+            outerKempe:
+            for (const s1 of freeTeacherSlots) {
+              for (const s2 of freeClassSlots) {
+                if (s1.d === s2.d && s1.p === s2.p) continue;
+                const chain = [];
+                const visitedClasses = new Set();
+                let currClass = asg.classId;
+                let validChain = true;
+
+                while (currClass) {
+                  if (visitedClasses.has(currClass)) {
+                    validChain = false;
+                    break;
+                  }
+                  visitedClasses.add(currClass);
+
+                  const cellInS1 = schedule[currClass][s1.d][s1.p];
+                  if (!cellInS1) break;
+
+                  const movingTeacherKey = normTeacher(cellInS1.teacher);
+                  const clashClassInS2 = teacherBusy[movingTeacherKey][s2.d][s2.p] || null;
+                  const cellInS2 = schedule[currClass][s2.d][s2.p];
+
+                  chain.push({
+                    classId: currClass,
+                    cellFromS1: cellInS1,
+                    cellFromS2: cellInS2
+                  });
+
+                  if (!clashClassInS2) {
+                    if (!cellInS2) break;
+                    const s2TeacherKey = normTeacher(cellInS2.teacher);
+                    const nextClassInS1 = teacherBusy[s2TeacherKey][s1.d][s1.p] || null;
+                    if (!nextClassInS1 || nextClassInS1 === currClass) break;
+                    currClass = nextClassInS1;
+                  } else {
+                    if (clashClassInS2 === currClass) {
+                      validChain = false;
+                      break;
+                    }
+                    if (cellInS2) {
+                      const s2TKey = normTeacher(cellInS2.teacher);
+                      if (teacherBusy[s2TKey][s1.d][s1.p] && teacherBusy[s2TKey][s1.d][s1.p] !== currClass) {
+                        validChain = false;
+                        break;
+                      }
+                    }
+                    currClass = clashClassInS2;
+                  }
+                }
+
+                if (validChain && chain.length > 0) {
+                  let conflict = false;
+                  const movedClasses = new Set(chain.map(step => step.classId));
+                  for (const step of chain) {
+                    if (step.cellFromS1) {
+                      const tk1 = normTeacher(step.cellFromS1.teacher);
+                      const occ2 = teacherBusy[tk1][s2.d][s2.p];
+                      if (occ2 && !movedClasses.has(occ2)) { conflict = true; break; }
+                    }
+                    if (step.cellFromS2) {
+                      const tk2 = normTeacher(step.cellFromS2.teacher);
+                      const occ1 = teacherBusy[tk2][s1.d][s1.p];
+                      if (occ1 && !movedClasses.has(occ1)) { conflict = true; break; }
+                    }
+                  }
+
+                  if (!conflict) {
+                    chain.forEach(step => {
+                      if (step.cellFromS1) delete teacherBusy[normTeacher(step.cellFromS1.teacher)][s1.d][s1.p];
+                      if (step.cellFromS2) delete teacherBusy[normTeacher(step.cellFromS2.teacher)][s2.d][s2.p];
+                    });
+                    chain.forEach(step => {
+                      schedule[step.classId][s1.d][s1.p] = step.cellFromS2 || null;
+                      schedule[step.classId][s2.d][s2.p] = step.cellFromS1 || null;
+                      if (step.cellFromS2) teacherBusy[normTeacher(step.cellFromS2.teacher)][s1.d][s1.p] = step.classId;
+                      if (step.cellFromS1) teacherBusy[normTeacher(step.cellFromS1.teacher)][s2.d][s2.p] = step.classId;
+                    });
+                    schedule[asg.classId][s1.d][s1.p] = {
+                      assignmentId: asg.id,
+                      teacher: asg.teacher,
+                      subject: asg.subject
+                    };
+                    teacherBusy[tKey][s1.d][s1.p] = asg.classId;
+                    placed = true;
+                    break outerKempe;
+                  }
+                }
+              }
+            }
+          }
+
+          if (!placed) {
+            unplaced.push({
+              teacher: asg.teacher,
+              subject: asg.subject,
+              classId: asg.classId
+            });
+          }
+        }
+      });
+
+      state.schedule = schedule;
+      state.unplacedPeriods = unplaced;
+      state.clashList = verifyZeroClashes(schedule, days, periods);
+    }
+
+    function verifyZeroClashes(schedule, days, periods) {
+      const clashes = [];
+      for (let d = 0; d < days; d++) {
+        for (let p = 1; p <= periods; p++) {
+          const seenTeachers = {};
+          state.classes.forEach(cls => {
+            const cell = schedule[cls.id] && schedule[cls.id][d] ? schedule[cls.id][d][p] : null;
+            if (cell && cell.teacher) {
+              const tk = cell.teacher.trim().toLowerCase();
+              if (seenTeachers[tk]) {
+                clashes.push({
+                  day: ALL_DAYS[d],
+                  period: p,
+                  teacher: cell.teacher,
+                  classA: seenTeachers[tk],
+                  classB: cls.name
+                });
+              } else {
+                seenTeachers[tk] = cls.name;
+              }
+            }
+          });
+        }
+      }
+      return clashes;
+    }
+
+    // =========================================================================
+    // 4. UI RENDERING HELPERS
+    // =========================================================================
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function getClassObj(classId) {
+      return state.classes.find(c => c.id === classId) || state.classes[0] || { id: 'NONE', name: 'No Class', std: '-', section: '-' };
+    }
+
+    function getUniqueTeachers() {
+      const map = new Map();
+      state.assignments.forEach(a => {
+        const key = a.teacher.trim().toLowerCase();
+        if (!map.has(key)) {
+          map.set(key, a.teacher.trim());
+        }
+      });
+      return Array.from(map.values()).sort((a, b) => a.localeCompare(b));
+    }
+
+    function getTeacherAssignedTotal(teacherName) {
+      const tKey = (teacherName || '').trim().toLowerCase();
+      return state.assignments
+        .filter(a => a.teacher.trim().toLowerCase() === tKey)
+        .reduce((sum, a) => sum + Number(a.periodsPerWeek), 0);
+    }
+
+    function getSubjectStyle(subject) {
+      const palettes = [
+        'subj-blue',
+        'subj-indigo',
+        'subj-violet',
+        'subj-sky',
+        'subj-teal',
+        'subj-rose',
+        'subj-orange',
+        'subj-cyan'
+      ];
+      let hash = 0;
+      const s = String(subject || '');
+      for (let i = 0; i < s.length; i++) {
+        hash = (hash * 31 + s.charCodeAt(i)) % palettes.length;
+      }
+      return palettes[Math.abs(hash)];
+    }
+
+    function showToast(msg) {
+      const banner = document.getElementById('toastBanner');
+      const text = document.getElementById('toastMessage');
+      text.textContent = msg;
+      banner.classList.remove('hidden');
+      if (window._toastTimer) clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        banner.classList.add('hidden');
+      }, 3500);
+    }
+
+    // =========================================================================
+    // 5. RENDER SELECTORS, STATS & TIMETABLE GRID
+    // =========================================================================
+    function renderAll() {
+      if (state.classes.length > 0 && !state.classes.some(c => c.id === state.selectedClassId)) {
+        state.selectedClassId = state.classes[0].id;
+      }
+      const validIds = new Set(state.classes.map(c => c.id));
+      Array.from(state.selectedFormClassIds).forEach(id => {
+        if (!validIds.has(id)) state.selectedFormClassIds.delete(id);
+      });
+
+      renderTopStats();
+      renderSelectControls();
+      renderClassPills();
+      renderTimetableGrid();
+      renderSubjectPills();
+      renderClassCheckboxes();
+      renderQuotaPreview();
+      renderRosterAndLoads();
+      renderAuditAndStructureView();
+    }
+
+    function renderTopStats() {
+      const teachers = getUniqueTeachers();
+      const mixedCount = state.classes.filter(c => c.section === 'Mixed').length;
+      const boysCount = state.classes.filter(c => c.section === 'Boys').length;
+      const girlsCount = state.classes.filter(c => c.section.includes('Girls')).length;
+
+      document.getElementById('statTotalClasses').textContent = state.classes.length;
+      document.getElementById('statClassesBreakdown').textContent = `${mixedCount} Mixed • ${boysCount} Boys • ${girlsCount} Girls`;
+
+      document.getElementById('statDailyPeriods').textContent = `${state.periodsPerDay} Periods`;
+      const breakSummary = state.breaks.length === 0
+        ? 'No Breaks'
+        : state.breaks.map(b => `${b.label} > P${b.afterPeriod}`).join(' • ');
+      document.getElementById('statDailyBreaks').textContent = breakSummary;
+
+      document.getElementById('statTeacherQuotaLabel').textContent = `${state.teacherTargetQuota} Periods`;
+      document.getElementById('statTotalAssignments').textContent = state.assignments.length;
+      document.getElementById('statTotalTeachers').textContent = `${teachers.length} Teachers`;
+
+      document.getElementById('headerSubtitle').textContent =
+        `${state.classes.length} Classes • ${state.periodsPerDay} Periods & ${state.breaks.length} Break(s) • Target ${state.teacherTargetQuota}p / Teacher`;
+
+      let totalPlaced = 0;
+      const days = state.daysCount;
+      state.classes.forEach(cls => {
+        for (let d = 0; d < days; d++) {
+          for (let p = 1; p <= state.periodsPerDay; p++) {
+            if (state.schedule[cls.id] && state.schedule[cls.id][d] && state.schedule[cls.id][d][p]) {
+              totalPlaced++;
+            }
+          }
+        }
+      });
+
+      document.getElementById('statScheduledSlots').textContent = totalPlaced;
+      const unplacedEl = document.getElementById('statUnplacedCount');
+      const badgeEl = document.getElementById('clashStatusBadge');
+
+      if (state.clashList.length === 0 && state.unplacedPeriods.length === 0) {
+        unplacedEl.textContent = '100% Clash-Free';
+        unplacedEl.style.color = '#059669';
+        badgeEl.innerHTML = `<span class="status-dot"></span>0 Clashes Verified`;
+      } else if (state.clashList.length === 0 && state.unplacedPeriods.length > 0) {
+        unplacedEl.textContent = state.unplacedPeriods.length + ' Over-capacity skipped';
+        unplacedEl.style.color = '#d97706';
+        badgeEl.innerHTML = `<span class="status-dot" style="background:#f59e0b;"></span>0 Clashes (${state.unplacedPeriods.length} full)`;
+      }
+    }
+
+    function renderSelectControls() {
+      const classSelect = document.getElementById('selectClassTarget');
+      if (state.classes.length === 0) {
+        classSelect.innerHTML = '<option value="">No classes configured</option>';
+      } else {
+        classSelect.innerHTML = state.classes.map(c =>
+          `<option value="${c.id}" ${c.id === state.selectedClassId ? 'selected' : ''}>${escapeHtml(c.name)}</option>`
+        ).join('');
+      }
+
+      const teachers = getUniqueTeachers();
+      if (!state.selectedTeacher || !teachers.includes(state.selectedTeacher)) {
+        state.selectedTeacher = teachers[0] || '';
+      }
+      const teacherSelect = document.getElementById('selectTeacherTarget');
+      if (teachers.length === 0) {
+        teacherSelect.innerHTML = '<option value="">No teachers added yet</option>';
+      } else {
+        teacherSelect.innerHTML = teachers.map(t => {
+          const load = getTeacherAssignedTotal(t);
+          return `<option value="${escapeHtml(t)}" ${t === state.selectedTeacher ? 'selected' : ''}>${escapeHtml(t)} (${load}p/wk)</option>`;
+        }).join('');
+      }
+
+      const daySelect = document.getElementById('selectDayTarget');
+      const activeDays = ALL_DAYS.slice(0, state.daysCount);
+      if (state.selectedDayIndex >= activeDays.length) {
+        state.selectedDayIndex = 0;
+      }
+      daySelect.innerHTML = activeDays.map((dayName, idx) =>
+        `<option value="${idx}" ${idx === state.selectedDayIndex ? 'selected' : ''}>${dayName}</option>`
+      ).join('');
+
+      document.getElementById('wrapperSelectClass').classList.toggle('hidden', state.viewMode !== 'class');
+      document.getElementById('wrapperSelectTeacher').classList.toggle('hidden', state.viewMode !== 'teacher');
+      document.getElementById('wrapperSelectDay').classList.toggle('hidden', state.viewMode !== 'master');
+      document.getElementById('classPillsBar').classList.toggle('hidden', state.viewMode !== 'class');
+
+      const dl = document.getElementById('existingTeachersDatalist');
+      dl.innerHTML = teachers.map(t => `<option value="${escapeHtml(t)}"></option>`).join('');
+    }
+
+    function renderClassPills() {
+      const container = document.getElementById('classPillsBar');
+      if (state.classes.length === 0) {
+        container.innerHTML = '<span style="font-size:12px; color:#94a3b8;">No classes configured. Add classes in the Clash Audit & Structure tab.</span>';
+        return;
+      }
+      container.innerHTML = state.classes.map(c => {
+        const isActive = c.id === state.selectedClassId;
+        return `<button type="button" data-pill-class="${c.id}" class="class-pill-btn ${isActive ? 'active' : ''}">
+          ${escapeHtml(c.name)}
+        </button>`;
+      }).join('');
+    }
+
+    function renderTimetableGrid() {
+      const thead = document.getElementById('timetableThead');
+      const tbody = document.getElementById('timetableTbody');
+      const heading = document.getElementById('timetableHeading');
+      const subheading = document.getElementById('timetableSubheading');
+      const legend = document.getElementById('timetableBreakLegend');
+      const activeDays = ALL_DAYS.slice(0, state.daysCount);
+      const dailySlots = getDailySlots();
+
+      legend.innerHTML = state.breaks.map((b, idx) => {
+        const isEmerald = b.color === 'emerald' || idx % 2 === 1;
+        const swatchBg = isEmerald ? '#d1fae5' : '#fef3c7';
+        const swatchBorder = isEmerald ? '#6ee7b7' : '#fcd34d';
+        return `<span style="display:inline-flex; align-items:center; gap:6px;">
+          <span style="width:10px; height:10px; border-radius:2px; background:${swatchBg}; border:1px solid ${swatchBorder}; display:inline-block;"></span>
+          ${escapeHtml(b.label)} (After P${b.afterPeriod})
+        </span>`;
+      }).join('');
+
+      const firstColLabel = state.viewMode === 'master' ? `Class (${state.classes.length} Sections)` : 'Day';
+      let headHtml = `<tr><th class="col-sticky-first">${firstColLabel}</th>`;
+
+      dailySlots.forEach(slot => {
+        if (slot.type === 'break') {
+          const isEmerald = slot.color === 'emerald';
+          const bg = isEmerald ? '#ecfdf5' : '#fffbeb';
+          const color = isEmerald ? '#065f46' : '#92400e';
+          headHtml += `<th class="th-break-col" style="background:${bg}; color:${color};">
+            <div>${escapeHtml(slot.label)}</div>
+            <div style="font-size:10px; font-weight:500; text-transform:none; opacity:0.85;">${escapeHtml(slot.sub)}</div>
+          </th>`;
+        } else {
+          headHtml += `<th>
+            <div>${escapeHtml(slot.label)}</div>
+            <div style="font-size:10px; font-weight:400; text-transform:none; color:#94a3b8;">${escapeHtml(slot.sub)}</div>
+          </th>`;
+        }
+      });
+      headHtml += `</tr>`;
+      thead.innerHTML = headHtml;
+
+      if (state.viewMode === 'class') {
+        const clsObj = getClassObj(state.selectedClassId);
+        const breaksDesc = state.breaks.length > 0
+          ? state.breaks.map(b => `${b.label} (after P${b.afterPeriod})`).join(' & ')
+          : 'No breaks';
+        heading.textContent = `${clsObj.name} — Weekly Timetable`;
+        subheading.textContent = `Standard: ${clsObj.std} • Section: ${clsObj.section} • ${state.periodsPerDay} Periods/Day • ${breaksDesc}`;
+
+        tbody.innerHTML = activeDays.map((dayName, dIdx) => {
+          let rowHtml = `<tr>
+            <td class="col-day-cell">${dayName}</td>`;
+
+          dailySlots.forEach(slot => {
+            if (slot.type === 'break') {
+              const isEmerald = slot.color === 'emerald';
+              rowHtml += `<td class="${isEmerald ? 'col-break-emerald' : 'col-break-amber'}">
+                ${escapeHtml(slot.sub || slot.label)}
+              </td>`;
+            } else {
+              const cell = state.schedule[clsObj.id] && state.schedule[clsObj.id][dIdx]
+                ? state.schedule[clsObj.id][dIdx][slot.periodNum]
+                : null;
+              if (cell) {
+                const badgeCls = getSubjectStyle(cell.subject);
+                rowHtml += `<td class="col-period-cell">
+                  <div class="period-slot-card ${badgeCls}">
+                    <div class="period-slot-subject">${escapeHtml(cell.subject)}</div>
+                    <div class="period-slot-teacher">${escapeHtml(cell.teacher)}</div>
+                  </div>
+                </td>`;
+              } else {
+                rowHtml += `<td class="col-period-cell">
+                  <div class="period-slot-free">Free</div>
+                </td>`;
+              }
+            }
+          });
+
+          rowHtml += `</tr>`;
+          return rowHtml;
+        }).join('');
+
+      } else if (state.viewMode === 'teacher') {
+        const teacherName = state.selectedTeacher;
+        const tKey = (teacherName || '').trim().toLowerCase();
+        const assignedTotal = getTeacherAssignedTotal(teacherName);
+
+        let scheduledCount = 0;
+        activeDays.forEach((_, dIdx) => {
+          for (let p = 1; p <= state.periodsPerDay; p++) {
+            for (const cls of state.classes) {
+              const cell = state.schedule[cls.id] && state.schedule[cls.id][dIdx] ? state.schedule[cls.id][dIdx][p] : null;
+              if (cell && cell.teacher.trim().toLowerCase() === tKey) {
+                scheduledCount++;
+              }
+            }
+          }
+        });
+
+        heading.textContent = teacherName ? `${teacherName} — Teacher Weekly Schedule (${scheduledCount} / ${assignedTotal} Periods)` : 'Teacher Weekly Schedule';
+        subheading.textContent = `Teacher Workload: ${assignedTotal} periods/week assigned • 0 Clashes`;
+
+        tbody.innerHTML = activeDays.map((dayName, dIdx) => {
+          let rowHtml = `<tr>
+            <td class="col-day-cell">${dayName}</td>`;
+
+          dailySlots.forEach(slot => {
+            if (slot.type === 'break') {
+              const isEmerald = slot.color === 'emerald';
+              rowHtml += `<td class="${isEmerald ? 'col-break-emerald' : 'col-break-amber'}">
+                ${escapeHtml(slot.sub || slot.label)}
+              </td>`;
+            } else {
+              let matchedClass = null;
+              let matchedCell = null;
+              for (const cls of state.classes) {
+                const cell = state.schedule[cls.id] && state.schedule[cls.id][dIdx]
+                  ? state.schedule[cls.id][dIdx][slot.periodNum]
+                  : null;
+                if (cell && cell.teacher.trim().toLowerCase() === tKey) {
+                  matchedClass = cls;
+                  matchedCell = cell;
+                  break;
+                }
+              }
+
+              if (matchedCell && matchedClass) {
+                const badgeCls = getSubjectStyle(matchedCell.subject);
+                rowHtml += `<td class="col-period-cell">
+                  <div class="period-slot-card ${badgeCls}">
+                    <div class="period-slot-subject">${escapeHtml(matchedClass.name)}</div>
+                    <div class="period-slot-teacher">${escapeHtml(matchedCell.subject)}</div>
+                  </div>
+                </td>`;
+              } else {
+                rowHtml += `<td class="col-period-cell">
+                  <div class="period-slot-free">Free</div>
+                </td>`;
+              }
+            }
+          });
+
+          rowHtml += `</tr>`;
+          return rowHtml;
+        }).join('');
+
+      } else if (state.viewMode === 'master') {
+        const dIdx = state.selectedDayIndex;
+        const dayName = ALL_DAYS[dIdx] || 'Monday';
+        heading.textContent = `Master School Timetable — ${dayName} (All ${state.classes.length} Classes)`;
+        subheading.textContent = `Every column is verified to have unique teachers across all ${state.classes.length} classes`;
+
+        tbody.innerHTML = state.classes.map(cls => {
+          let secBg = '#f1f5f9';
+          let secColor = '#334155';
+          if (cls.section === 'Boys') { secBg = '#dbeafe'; secColor = '#1d4ed8'; }
+          if (cls.section.includes('Girls')) { secBg = '#fce7f3'; secColor = '#be185d'; }
+
+          let rowHtml = `<tr>
+            <td class="col-day-cell">
+              <div>${escapeHtml(cls.name)}</div>
+              <span style="display:inline-block; margin-top:2px; padding:1px 6px; border-radius:4px; font-size:10px; font-weight:600; background:${secBg}; color:${secColor};">${escapeHtml(cls.section)}</span>
+            </td>`;
+
+          dailySlots.forEach(slot => {
+            if (slot.type === 'break') {
+              const isEmerald = slot.color === 'emerald';
+              rowHtml += `<td class="${isEmerald ? 'col-break-emerald' : 'col-break-amber'}">
+                ${escapeHtml(slot.sub || slot.label)}
+              </td>`;
+            } else {
+              const cell = state.schedule[cls.id] && state.schedule[cls.id][dIdx]
+                ? state.schedule[cls.id][dIdx][slot.periodNum]
+                : null;
+              if (cell) {
+                const badgeCls = getSubjectStyle(cell.subject);
+                rowHtml += `<td class="col-period-cell">
+                  <div class="period-slot-card ${badgeCls}">
+                    <div class="period-slot-subject">${escapeHtml(cell.subject)}</div>
+                    <div class="period-slot-teacher">${escapeHtml(cell.teacher)}</div>
+                  </div>
+                </td>`;
+              } else {
+                rowHtml += `<td class="col-period-cell">
+                  <div class="period-slot-free">—</div>
+                </td>`;
+              }
+            }
+          });
+
+          rowHtml += `</tr>`;
+          return rowHtml;
+        }).join('');
+      }
+    }
+
+    // =========================================================================
+    // 6. RENDER TEACHERS & ASSIGNMENTS TAB (MULTI-SUBJECT + EDITABLE PERIODS)
+    // =========================================================================
+    function getEffectiveSelectedSubjects() {
+      const set = new Set(Array.from(state.selectedFormSubjects));
+      const rawInput = (document.getElementById('inputSubjectName').value || '').trim();
+      if (rawInput) {
+        rawInput.split(',').map(s => s.trim()).filter(Boolean).forEach(s => set.add(s));
+      }
+      return Array.from(set);
+    }
+
+    function syncSubjectInputFromSet() {
+      const inputEl = document.getElementById('inputSubjectName');
+      inputEl.value = Array.from(state.selectedFormSubjects).join(', ');
+    }
+
+    function renderSubjectPills() {
+      const grid = document.getElementById('multiSubjectPillsGrid');
+      const countEl = document.getElementById('selectedSubjectCountLabel');
+      const effectiveSubjects = getEffectiveSelectedSubjects();
+      countEl.textContent = `${effectiveSubjects.length} subject${effectiveSubjects.length === 1 ? '' : 's'} selected`;
+
+      grid.innerHTML = state.availableSubjects.map(subj => {
+        const isSelected = state.selectedFormSubjects.has(subj) ||
+          effectiveSubjects.some(x => x.toLowerCase() === subj.toLowerCase());
+        return `<button type="button" data-subject-pill="${escapeHtml(subj)}" class="class-pill-btn ${isSelected ? 'active' : ''}" style="display:inline-flex; align-items:center; gap:5px; padding:4px 9px; font-size:11.5px;">
+          <span>${isSelected ? '✓' : '+'}</span>
+          <span>${escapeHtml(subj)}</span>
+        </button>`;
+      }).join('');
+    }
+
+    function renderClassCheckboxes() {
+      const grid = document.getElementById('checkboxClassesGrid');
+      const countLabel = document.getElementById('selectedClassCountLabel');
+      countLabel.textContent = `${state.selectedFormClassIds.size} of ${state.classes.length} selected`;
+
+      const selectedArr = Array.from(state.selectedFormClassIds);
+      const effectiveSubjects = getEffectiveSelectedSubjects();
+      const subjCount = Math.max(1, effectiveSubjects.length);
+      const totalPairs = selectedArr.length * subjCount;
+      const inputVal = Math.max(1, Number(document.getElementById('inputPeriodsPerWeek').value) || state.teacherTargetQuota);
+      const mode = document.getElementById('selectPeriodAllocationMode').value;
+
+      const shareMap = {};
+      if (mode === 'total_teacher' && totalPairs > 0) {
+        const shares = splitPeriodsAcrossClasses(inputVal, totalPairs);
+        selectedArr.forEach((cid, cIdx) => {
+          let classSum = 0;
+          for (let sIdx = 0; sIdx < subjCount; sIdx++) {
+            classSum += shares[cIdx * subjCount + sIdx] || 0;
+          }
+          shareMap[cid] = classSum;
+        });
+      } else {
+        selectedArr.forEach(cid => { shareMap[cid] = inputVal * subjCount; });
+      }
+
+      grid.innerHTML = state.classes.map(cls => {
+        const checked = state.selectedFormClassIds.has(cls.id);
+        return `<label class="class-check-item ${checked ? 'checked' : ''}">
+          <input type="checkbox" value="${cls.id}" ${checked ? 'checked' : ''} class="form-class-checkbox sr-only" />
+          <span class="check-box-icon">${checked ? '✓' : ''}</span>
+          <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:500;">${escapeHtml(cls.name)}</span>
+          <span style="margin-left:auto; font-size:10px; font-weight:700; color:${checked ? '#6ee7b7' : '#64748b'};">${checked ? shareMap[cls.id] + 'p' : ''}</span>
+        </label>`;
+      }).join('');
+    }
+
+    function renderQuotaPreview() {
+      const box = document.getElementById('quotaPreviewBox');
+      const selectedArr = Array.from(state.selectedFormClassIds);
+      const effectiveSubjects = getEffectiveSelectedSubjects();
+      const subjLabelList = effectiveSubjects.length > 0 ? effectiveSubjects : ['Subject'];
+      const totalPairs = selectedArr.length * subjLabelList.length;
+      const inputVal = Math.max(1, Number(document.getElementById('inputPeriodsPerWeek').value) || state.teacherTargetQuota);
+      const mode = document.getElementById('selectPeriodAllocationMode').value;
+
+      if (selectedArr.length === 0) {
+        box.innerHTML = `<span style="color:#b45309; font-weight:500;">Select at least 1 class below to preview the period assignment.</span>`;
+        return;
+      }
+
+      const pairs = [];
+      selectedArr.forEach(cid => {
+        subjLabelList.forEach(subj => {
+          pairs.push({ cid, className: getClassObj(cid).name, subj });
+        });
+      });
+
+      if (mode === 'total_teacher') {
+        const shares = splitPeriodsAcrossClasses(inputVal, pairs.length);
+        const totalSum = shares.reduce((a, b) => a + b, 0);
+        const breakdown = pairs.map((p, idx) => `${escapeHtml(p.className)} (${escapeHtml(p.subj)}): <strong>${shares[idx]}p</strong>`).join(' • ');
+        box.innerHTML = `
+          <div style="display:flex; align-items:center; justify-content:space-between; font-weight:600; color:#0f172a; margin-bottom:4px;">
+            <span>Auto-Split: ${subjLabelList.length} Subject(s) × ${selectedArr.length} Class(es)</span>
+            <span style="color:#047857;">Teacher Total = ${totalSum} Periods / Wk</span>
+          </div>
+          <div style="font-size:11px; color:#475569; line-height:1.5;">${breakdown}</div>
+        `;
+      } else {
+        const totalSum = pairs.length * inputVal;
+        const breakdown = pairs.map(p => `${escapeHtml(p.className)} (${escapeHtml(p.subj)}): <strong>${inputVal}p</strong>`).join(' • ');
+        box.innerHTML = `
+          <div style="display:flex; align-items:center; justify-content:space-between; font-weight:600; color:#0f172a; margin-bottom:4px;">
+            <span>${inputVal}p per Class-Subject (${subjLabelList.length} Subject(s) × ${selectedArr.length} Class(es))</span>
+            <span style="color:#047857;">Added Total = ${totalSum} Periods / Wk</span>
+          </div>
+          <div style="font-size:11px; color:#475569; line-height:1.5;">${breakdown}</div>
+        `;
+      }
+    }
+
+    function renderRosterAndLoads() {
+      document.getElementById('inputGlobalTeacherQuota').value = state.teacherTargetQuota;
+
+      const teacherLoads = {};
+      state.assignments.forEach(a => {
+        const name = a.teacher.trim();
+        teacherLoads[name] = (teacherLoads[name] || 0) + Number(a.periodsPerWeek);
+      });
+
+      const loadBar = document.getElementById('teacherLoadBar');
+      const teacherEntries = Object.entries(teacherLoads).sort((a, b) => a[0].localeCompare(b[0]));
+      if (teacherEntries.length === 0) {
+        loadBar.innerHTML = '<span style="font-size:12px; color:#94a3b8;">No teachers assigned yet. Use the form on the left to add a teacher.</span>';
+      } else {
+        loadBar.innerHTML = teacherEntries.map(([tName, load]) => {
+          const matchesTarget = load === state.teacherTargetQuota;
+          const bg = matchesTarget ? '#ecfdf5' : '#ffffff';
+          const border = matchesTarget ? '#a7f3d0' : '#cbd5e1';
+          const color = matchesTarget ? '#065f46' : '#334155';
+          const tSubjects = Array.from(new Set(
+            state.assignments
+              .filter(a => a.teacher.trim().toLowerCase() === tName.toLowerCase())
+              .map(a => a.subject.trim())
+          ));
+          return `<span style="display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:6px; font-size:12px; background:${bg}; border:1px solid ${border}; color:${color};">
+            <span style="font-weight:600;">${escapeHtml(tName)}</span>
+            <span style="font-size:11px; opacity:0.8;">(${escapeHtml(tSubjects.join(', '))})</span>
+            <span style="font-size:11px; font-weight:700;">${load}p/wk</span>
+          </span>`;
+        }).join('');
+      }
+
+      const q = state.rosterFilter.trim().toLowerCase();
+      const filtered = state.assignments.filter(a => {
+        if (!q) return true;
+        const clsName = getClassObj(a.classId).name.toLowerCase();
+        return a.teacher.toLowerCase().includes(q) ||
+               a.subject.toLowerCase().includes(q) ||
+               clsName.includes(q);
+      });
+
+      const tbody = document.getElementById('rosterTableBody');
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="padding:32px; text-align:center; color:#94a3b8; font-size:12px;">No matching teacher assignments found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(a => {
+        const cls = getClassObj(a.classId);
+        const tTotal = getTeacherAssignedTotal(a.teacher);
+        return `<tr>
+          <td>
+            <div style="font-weight:600; color:#0f172a;">${escapeHtml(a.teacher)}</div>
+            <div style="font-size:11px; color:#64748b;">Teacher Total: ${tTotal} periods/wk</div>
+          </td>
+          <td style="color:#334155;">${escapeHtml(a.subject)}</td>
+          <td>
+            <span style="display:inline-block; padding:2px 8px; border-radius:5px; font-size:12px; font-weight:500; background:#f1f5f9; color:#1e293b;">
+              ${escapeHtml(cls.name)}
+            </span>
+          </td>
+          <td style="text-align:center;">
+            <input type="number" min="1" max="48" value="${a.periodsPerWeek}" data-edit-periods-id="${a.id}" class="form-input" style="width:68px; padding:4px 6px; font-size:12px; font-weight:700; text-align:center; background:#ffffff; display:inline-block;" title="Edit weekly periods for this class assignment" />
+          </td>
+          <td style="text-align:right;">
+            <button type="button" data-delete-id="${a.id}" class="btn-danger-outline" style="padding:4px 8px; font-size:11px;">
+              Remove
+            </button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    // =========================================================================
+    // 7. RENDER CLASH AUDIT & EDITABLE SCHOOL STRUCTURE TAB
+    // =========================================================================
+    function renderAuditAndStructureView() {
+      const container = document.getElementById('auditDetailsContainer');
+      const maxSlots = state.daysCount * state.periodsPerDay;
+      const teachers = getUniqueTeachers();
+
+      let html = '';
+      if (state.clashList.length === 0) {
+        html += `<div style="padding:14px; border-radius:8px; background:#ecfdf5; border:1px solid #a7f3d0; color:#065f46;">
+          <div style="font-weight:700; font-size:13px;">Zero Teacher or Class Clashes Detected</div>
+          <p style="font-size:12px; color:#047857; margin:4px 0 0 0;">
+            Checked all ${state.daysCount} days × ${state.periodsPerDay} periods (${maxSlots} weekly slots) across all ${state.classes.length} classes. Every teacher is assigned to at most 1 class in any period.
+          </p>
+        </div>`;
+      } else {
+        html += `<div style="padding:14px; border-radius:8px; background:#fef2f2; border:1px solid #fecaca; color:#991b1b;">
+          <div style="font-weight:700; font-size:13px;">${state.clashList.length} Clashes Found</div>
+        </div>`;
+      }
+
+      html += `<div style="padding:14px; border-radius:8px; background:#f8fafc; border:1px solid #e2e8f0; color:#1e293b;">
+        <div style="font-weight:700; font-size:13px;">Active Configuration Summary (${teachers.length} Teachers)</div>
+        <p style="font-size:12px; color:#475569; margin:4px 0 0 0;">
+          ${state.classes.length} Classes • ${state.periodsPerDay} Teaching Periods/Day • ${state.breaks.length} Break(s)/Day • Target Teacher Quota: <strong>${state.teacherTargetQuota} periods/week</strong>.
+        </p>
+      </div>`;
+
+      if (state.unplacedPeriods.length > 0) {
+        html += `<div style="grid-column: 1 / -1; padding:12px 14px; border-radius:8px; background:#fffbeb; border:1px solid #fde68a; color:#92400e; font-size:12px; font-weight:600;">
+          Note: ${state.unplacedPeriods.length} period(s) could not be placed because a teacher or class exceeded the ${maxSlots}-period weekly capacity.
+        </div>`;
+      }
+
+      container.innerHTML = html;
+
+      document.getElementById('inputPeriodsPerDay').value = state.periodsPerDay;
+      document.getElementById('inputNewBreakAfter').max = state.periodsPerDay;
+
+      const breaksListEl = document.getElementById('breaksEditorList');
+      if (state.breaks.length === 0) {
+        breaksListEl.innerHTML = `<div style="padding:12px; border-radius:8px; background:#f8fafc; border:1px solid #e2e8f0; font-size:12px; color:#94a3b8; text-align:center;">No breaks configured. Use the form below to add a break.</div>`;
+      } else {
+        breaksListEl.innerHTML = state.breaks.map(b => `
+          <div class="break-editor-row">
+            <div>
+              <label class="form-label">Break Name</label>
+              <input type="text" value="${escapeHtml(b.label)}" data-break-field="label" data-break-id="${b.id}" class="form-input" style="background:#ffffff; font-weight:600; font-size:12px;" />
+            </div>
+            <div>
+              <label class="form-label">Subtitle / Purpose</label>
+              <input type="text" value="${escapeHtml(b.sub)}" data-break-field="sub" data-break-id="${b.id}" class="form-input" style="background:#ffffff; font-size:12px;" />
+            </div>
+            <div>
+              <label class="form-label">After P#</label>
+              <input type="number" min="1" max="${state.periodsPerDay}" value="${b.afterPeriod}" data-break-field="afterPeriod" data-break-id="${b.id}" class="form-input" style="background:#ffffff; font-weight:700; font-size:12px; text-align:center;" />
+            </div>
+            <div>
+              <button type="button" data-delete-break="${b.id}" class="btn-danger-outline" style="padding:7px 10px;">
+                Delete
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      const seqList = document.getElementById('liveDailySequenceList');
+      const dailySlots = getDailySlots();
+      seqList.innerHTML = dailySlots.map(slot => {
+        if (slot.type === 'break') {
+          const isEmerald = slot.color === 'emerald';
+          const bg = isEmerald ? '#ecfdf5' : '#fffbeb';
+          const border = isEmerald ? '#a7f3d0' : '#fde68a';
+          const color = isEmerald ? '#065f46' : '#92400e';
+          return `<li style="display:flex; justify-content:space-between; padding:6px 10px; border-radius:6px; background:${bg}; border:1px solid ${border}; color:${color}; font-weight:600;">
+            <span>${escapeHtml(slot.label)} (${escapeHtml(slot.sub)})</span>
+            <span>After Period ${slot.afterPeriod}</span>
+          </li>`;
+        }
+        return `<li style="display:flex; justify-content:space-between; padding:6px 10px; border-radius:6px; background:#f8fafc; border:1px solid #f1f5f9; color:#334155;">
+          <span><strong>${escapeHtml(slot.label)}</strong></span>
+          <span>Teaching Slot ${slot.periodNum}</span>
+        </li>`;
+      }).join('');
+
+      const classesBody = document.getElementById('classesAuditBody');
+      if (state.classes.length === 0) {
+        classesBody.innerHTML = `<tr><td colspan="5" style="padding:24px; text-align:center; color:#94a3b8; font-size:12px;">No classes configured. Add a class above or reset default 19 classes.</td></tr>`;
+        return;
+      }
+
+      classesBody.innerHTML = state.classes.map(cls => {
+        const assignedCount = state.assignments
+          .filter(a => a.classId === cls.id)
+          .reduce((sum, a) => sum + Number(a.periodsPerWeek), 0);
+
+        return `<tr>
+          <td>
+            <input type="text" value="${escapeHtml(cls.name)}" data-class-field="name" data-class-id="${cls.id}" class="form-input" style="background:#ffffff; font-weight:600; font-size:12px; padding:5px 8px;" />
+          </td>
+          <td>
+            <input type="text" value="${escapeHtml(cls.std)}" data-class-field="std" data-class-id="${cls.id}" class="form-input" style="background:#ffffff; font-size:12px; padding:5px 8px;" />
+          </td>
+          <td>
+            <select data-class-field="section" data-class-id="${cls.id}" class="form-select" style="background:#ffffff; font-size:12px; padding:5px 8px;">
+              <option value="Mixed" ${cls.section === 'Mixed' ? 'selected' : ''}>Mixed</option>
+              <option value="Boys" ${cls.section === 'Boys' ? 'selected' : ''}>Boys</option>
+              <option value="Girls" ${cls.section === 'Girls' ? 'selected' : ''}>Girls</option>
+              <option value="Girls Only" ${cls.section === 'Girls Only' ? 'selected' : ''}>Girls Only</option>
+            </select>
+          </td>
+          <td style="text-align:right; font-weight:600; color:#334155; white-space:nowrap;">${assignedCount}/${maxSlots}p</td>
+          <td style="text-align:right;">
+            <button type="button" data-delete-class="${cls.id}" class="btn-danger-outline" style="padding:4px 8px; font-size:11px;">
+              Delete
+            </button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    // =========================================================================
+    // 8. EXPORT TIMETABLE TO CSV
+    // =========================================================================
+    function exportCurrentTimetableCsv() {
+      const rows = [];
+      const activeDays = ALL_DAYS.slice(0, state.daysCount);
+      const dailySlots = getDailySlots();
+
+      const headers = ['Class', 'Standard', 'Section', 'Day', ...dailySlots.map(s => s.type === 'break' ? `${s.label} (${s.sub})` : s.label)];
+      rows.push(headers);
+
+      state.classes.forEach(cls => {
+        activeDays.forEach((dayName, dIdx) => {
+          const row = [cls.name, cls.std, cls.section, dayName];
+          dailySlots.forEach(slot => {
+            if (slot.type === 'break') {
+              row.push((slot.sub || slot.label).toUpperCase());
+            } else {
+              const cell = state.schedule[cls.id] && state.schedule[cls.id][dIdx]
+                ? state.schedule[cls.id][dIdx][slot.periodNum]
+                : null;
+              row.push(cell ? `${cell.subject} (${cell.teacher})` : 'Free');
+            }
+          });
+          rows.push(row);
+        });
+      });
+
+      const csvContent = rows.map(r => r.map(field => `"${String(field).replace(/"/g, '""')}"`).join(',')).join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'school_timetable_export.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Exported timetable to CSV.');
+    }
+
+    // =========================================================================
+    // 8B. EXPORT & IMPORT JSON BACKUP (DATABASE-FREE PERSISTENCE)
+    // =========================================================================
+    function buildBackupPayload() {
+      return {
+        app: 'Timetable Maker',
+        version: 4,
+        exportedAt: new Date().toISOString(),
+        daysCount: state.daysCount,
+        periodsPerDay: state.periodsPerDay,
+        teacherTargetQuota: state.teacherTargetQuota,
+        classes: state.classes,
+        breaks: state.breaks,
+        assignments: state.assignments,
+        schedule: state.schedule
+      };
+    }
+
+    function exportSchoolJson() {
+      const payload = buildBackupPayload();
+      const jsonStr = JSON.stringify(payload, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'timetable_maker_backup.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Exported full school configuration & timetable to JSON.');
+    }
+
+    function applyImportedJsonString(rawJsonStr) {
+      try {
+        const parsed = JSON.parse(rawJsonStr);
+        if (!parsed || typeof parsed !== 'object') {
+          showToast('Invalid JSON format: expected a JSON object.');
+          return false;
+        }
+        if (!Array.isArray(parsed.classes) || parsed.classes.length === 0) {
+          showToast('Invalid JSON backup: missing "classes" array.');
+          return false;
+        }
+        if (!Array.isArray(parsed.assignments)) {
+          showToast('Invalid JSON backup: missing "assignments" array.');
+          return false;
+        }
+
+        state.classes = parsed.classes.map((c, idx) => ({
+          id: String(c.id || ('CLS_' + idx)),
+          name: String(c.name || ('Class ' + (idx + 1))),
+          std: String(c.std || '-'),
+          section: String(c.section || 'Mixed'),
+          group: String(c.group || 'primary')
+        }));
+
+        if (Array.isArray(parsed.breaks)) {
+          state.breaks = parsed.breaks.map((b, idx) => ({
+            id: String(b.id || ('brk_' + idx)),
+            label: String(b.label || ('Break ' + (idx + 1))),
+            sub: String(b.sub || 'Break'),
+            afterPeriod: Math.max(1, Number(b.afterPeriod) || 2),
+            color: b.color === 'emerald' ? 'emerald' : 'amber'
+          }));
+        }
+
+        if (parsed.periodsPerDay >= 1 && parsed.periodsPerDay <= 12) {
+          state.periodsPerDay = Number(parsed.periodsPerDay);
+        }
+        if (parsed.teacherTargetQuota >= 1 && parsed.teacherTargetQuota <= 60) {
+          state.teacherTargetQuota = Number(parsed.teacherTargetQuota);
+        }
+        if (parsed.daysCount === 5 || parsed.daysCount === 6) {
+          state.daysCount = Number(parsed.daysCount);
+        }
+
+        const validIds = new Set(state.classes.map(c => c.id));
+        state.assignments = parsed.assignments
+          .filter(a => a && a.teacher && a.subject && validIds.has(String(a.classId)))
+          .map((a, idx) => ({
+            id: String(a.id || ('asg_imp_' + idx)),
+            teacher: String(a.teacher).trim(),
+            subject: String(a.subject).trim(),
+            classId: String(a.classId),
+            periodsPerWeek: Math.max(1, Number(a.periodsPerWeek) || 1)
+          }));
+
+        document.getElementById('selectWeekDays').value = String(state.daysCount);
+        document.getElementById('inputPeriodsPerWeek').value = String(state.teacherTargetQuota);
+        document.getElementById('inputGlobalTeacherQuota').value = String(state.teacherTargetQuota);
+
+        saveState();
+        generateTimetable();
+        renderAll();
+        showToast(`Imported JSON backup (${state.classes.length} classes, ${state.assignments.length} assignments).`);
+        return true;
+      } catch (err) {
+        showToast('Could not parse JSON backup. Please check the file or text format.');
+        return false;
+      }
+    }
+
+    // =========================================================================
+    // 9. EVENT LISTENERS & INITIALIZATION
+    // =========================================================================
+    function switchTab(tabName) {
+      state.activeTab = tabName;
+      const views = {
+        schedule: document.getElementById('viewSchedule'),
+        teachers: document.getElementById('viewTeachers'),
+        audit: document.getElementById('viewAudit')
+      };
+      const btns = {
+        schedule: document.getElementById('tabBtnSchedule'),
+        teachers: document.getElementById('tabBtnTeachers'),
+        audit: document.getElementById('tabBtnAudit')
+      };
+
+      Object.keys(views).forEach(k => {
+        if (k === tabName) {
+          views[k].classList.remove('hidden');
+          btns[k].className = 'nav-tab-btn active';
+        } else {
+          views[k].classList.add('hidden');
+          btns[k].className = 'nav-tab-btn';
+        }
+      });
+    }
+
+    let _eventsInitialized = false;
+    function initEvents() {
+      if (_eventsInitialized) return;
+      _eventsInitialized = true;
+
+      document.getElementById('tabBtnSchedule').addEventListener('click', () => switchTab('schedule'));
+      document.getElementById('tabBtnTeachers').addEventListener('click', () => switchTab('teachers'));
+      document.getElementById('tabBtnAudit').addEventListener('click', () => switchTab('audit'));
+
+      document.getElementById('btnJumpToAdd').addEventListener('click', () => {
+        switchTab('teachers');
+        document.getElementById('inputTeacherName').focus();
+      });
+      document.getElementById('btnJumpToStructure').addEventListener('click', () => switchTab('audit'));
+      document.getElementById('btnQuickEditClasses').addEventListener('click', () => switchTab('audit'));
+      document.getElementById('btnQuickEditSchedule').addEventListener('click', () => switchTab('audit'));
+      document.getElementById('btnQuickEditTeachers').addEventListener('click', () => switchTab('teachers'));
+
+      document.getElementById('btnCloseToast').addEventListener('click', () => {
+        document.getElementById('toastBanner').classList.add('hidden');
+      });
+
+      document.getElementById('btnRegenerate').addEventListener('click', () => {
+        generateTimetable();
+        renderAll();
+        showToast('Clash-free timetable generated.');
+      });
+
+      document.getElementById('selectViewMode').addEventListener('change', (e) => {
+        state.viewMode = e.target.value;
+        renderSelectControls();
+        renderTimetableGrid();
+      });
+
+      document.getElementById('selectClassTarget').addEventListener('change', (e) => {
+        state.selectedClassId = e.target.value;
+        renderClassPills();
+        renderTimetableGrid();
+      });
+
+      document.getElementById('selectTeacherTarget').addEventListener('change', (e) => {
+        state.selectedTeacher = e.target.value;
+        renderTimetableGrid();
+      });
+
+      document.getElementById('selectDayTarget').addEventListener('change', (e) => {
+        state.selectedDayIndex = Number(e.target.value) || 0;
+        renderTimetableGrid();
+      });
+
+      document.getElementById('selectWeekDays').addEventListener('change', (e) => {
+        state.daysCount = Number(e.target.value) === 6 ? 6 : 5;
+        saveState();
+        generateTimetable();
+        renderAll();
+        showToast(`Updated school week to ${state.daysCount} days.`);
+      });
+
+      document.getElementById('classPillsBar').addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-pill-class]');
+        if (btn) {
+          state.selectedClassId = btn.getAttribute('data-pill-class');
+          renderSelectControls();
+          renderClassPills();
+          renderTimetableGrid();
+        }
+      });
+
+      document.getElementById('btnExportCsv').addEventListener('click', exportCurrentTimetableCsv);
+      document.getElementById('btnPrint').addEventListener('click', () => window.print());
+
+      // JSON Export & Import Listeners
+      document.getElementById('btnExportJson').addEventListener('click', exportSchoolJson);
+
+      document.getElementById('btnImportJson').addEventListener('click', () => {
+        const fileInput = document.getElementById('inputImportJsonFile');
+        fileInput.value = '';
+        fileInput.click();
+      });
+
+      document.getElementById('inputImportJsonFile').addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          applyImportedJsonString(String(evt.target.result || ''));
+        };
+        reader.readAsText(file);
+      });
+
+      document.getElementById('btnOpenJsonModal').addEventListener('click', () => {
+        const modal = document.getElementById('jsonBackupModal');
+        const ta = document.getElementById('textareaJsonBackup');
+        ta.value = JSON.stringify(buildBackupPayload(), null, 2);
+        modal.classList.remove('hidden');
+      });
+
+      document.getElementById('btnCloseJsonModal').addEventListener('click', () => {
+        document.getElementById('jsonBackupModal').classList.add('hidden');
+      });
+
+      document.getElementById('btnCopyJsonClipboard').addEventListener('click', () => {
+        const ta = document.getElementById('textareaJsonBackup');
+        ta.select();
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(ta.value).then(() => {
+              showToast('Copied JSON backup to clipboard.');
+            }).catch(() => {
+              document.execCommand('copy');
+              showToast('Copied JSON backup to clipboard.');
+            });
+          } else {
+            document.execCommand('copy');
+            showToast('Copied JSON backup to clipboard.');
+          }
+        } catch (err) {
+          document.execCommand('copy');
+          showToast('Copied JSON backup to clipboard.');
+        }
+      });
+
+      document.getElementById('btnDownloadJsonFromModal').addEventListener('click', exportSchoolJson);
+
+      document.getElementById('btnApplyPastedJson').addEventListener('click', () => {
+        const ta = document.getElementById('textareaJsonBackup');
+        if (applyImportedJsonString(ta.value)) {
+          document.getElementById('jsonBackupModal').classList.add('hidden');
+        }
+      });
+
+      document.getElementById('inputGlobalTeacherQuota').addEventListener('change', (e) => {
+        const val = Math.max(1, Math.min(60, Number(e.target.value) || 24));
+        state.teacherTargetQuota = val;
+        document.getElementById('inputPeriodsPerWeek').value = val;
+        saveState();
+        renderAll();
+      });
+
+      document.getElementById('btnRebalanceAllTeachers').addEventListener('click', () => {
+        const val = Math.max(1, Math.min(60, Number(document.getElementById('inputGlobalTeacherQuota').value) || 24));
+        state.teacherTargetQuota = val;
+        document.getElementById('inputPeriodsPerWeek').value = val;
+        const teachers = getUniqueTeachers();
+        teachers.forEach(t => rebalanceTeacherToQuota(state.assignments, t, val));
+        saveState();
+        generateTimetable();
+        renderAll();
+        showToast(`Rebalanced all ${teachers.length} teachers to ${val} periods/week.`);
+      });
+
+      document.getElementById('inputPeriodsPerWeek').addEventListener('input', () => {
+        renderClassCheckboxes();
+        renderQuotaPreview();
+      });
+
+      document.getElementById('selectPeriodAllocationMode').addEventListener('change', () => {
+        renderClassCheckboxes();
+        renderQuotaPreview();
+      });
+
+      document.getElementById('rosterTableBody').addEventListener('change', (e) => {
+        const input = e.target.closest('[data-edit-periods-id]');
+        if (input) {
+          const id = input.getAttribute('data-edit-periods-id');
+          const newPeriods = Math.max(1, Math.min(60, Number(input.value) || 1));
+          const row = state.assignments.find(a => a.id === id);
+          if (row) {
+            row.periodsPerWeek = newPeriods;
+            saveState();
+            generateTimetable();
+            renderAll();
+            showToast(`Updated ${row.teacher} (${getClassObj(row.classId).name}) to ${newPeriods} periods/week.`);
+          }
+        }
+      });
+
+      document.querySelectorAll('.btn-class-group').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const group = btn.getAttribute('data-select-group');
+          if (group === 'clear') {
+            state.selectedFormClassIds.clear();
+          } else if (group === 'boys') {
+            state.classes.filter(c => c.section === 'Boys').forEach(c => state.selectedFormClassIds.add(c.id));
+          } else if (group === 'girls') {
+            state.classes.filter(c => c.section.includes('Girls')).forEach(c => state.selectedFormClassIds.add(c.id));
+          } else {
+            state.classes.filter(c => c.group === group).forEach(c => state.selectedFormClassIds.add(c.id));
+          }
+          renderClassCheckboxes();
+          renderQuotaPreview();
+        });
+      });
+
+      document.getElementById('checkboxClassesGrid').addEventListener('change', (e) => {
+        if (e.target.classList.contains('form-class-checkbox')) {
+          const cid = e.target.value;
+          if (e.target.checked) {
+            state.selectedFormClassIds.add(cid);
+          } else {
+            state.selectedFormClassIds.delete(cid);
+          }
+          renderClassCheckboxes();
+          renderQuotaPreview();
+        }
+      });
+
+      // Multi-subject selection listeners
+      document.getElementById('multiSubjectPillsGrid').addEventListener('click', (e) => {
+        const pill = e.target.closest('[data-subject-pill]');
+        if (!pill) return;
+        const subj = pill.getAttribute('data-subject-pill');
+        if (state.selectedFormSubjects.has(subj)) {
+          state.selectedFormSubjects.delete(subj);
+        } else {
+          state.selectedFormSubjects.add(subj);
+        }
+        syncSubjectInputFromSet();
+        renderSubjectPills();
+        renderClassCheckboxes();
+        renderQuotaPreview();
+      });
+
+      document.getElementById('inputSubjectName').addEventListener('input', (e) => {
+        const typedList = e.target.value.split(',').map(x => x.trim()).filter(Boolean);
+        state.selectedFormSubjects = new Set(typedList);
+        renderSubjectPills();
+        renderClassCheckboxes();
+        renderQuotaPreview();
+      });
+
+      document.getElementById('btnAddCustomSubject').addEventListener('click', () => {
+        const inputEl = document.getElementById('inputSubjectName');
+        const typedList = inputEl.value.split(',').map(x => x.trim()).filter(Boolean);
+        if (typedList.length === 0) return;
+        typedList.forEach(subj => {
+          if (!state.availableSubjects.some(x => x.toLowerCase() === subj.toLowerCase())) {
+            state.availableSubjects.push(subj);
+          }
+          state.selectedFormSubjects.add(subj);
+        });
+        syncSubjectInputFromSet();
+        renderSubjectPills();
+        renderClassCheckboxes();
+        renderQuotaPreview();
+        showToast(`Added ${typedList.join(', ')} to subjects.`);
+      });
+
+      document.getElementById('btnClearSubjects').addEventListener('click', () => {
+        state.selectedFormSubjects.clear();
+        document.getElementById('inputSubjectName').value = '';
+        renderSubjectPills();
+        renderClassCheckboxes();
+        renderQuotaPreview();
+      });
+
+      document.getElementById('formAddAssignment').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const teacherInput = document.getElementById('inputTeacherName');
+        const subjectInput = document.getElementById('inputSubjectName');
+        const periodsInput = document.getElementById('inputPeriodsPerWeek');
+        const modeSelect = document.getElementById('selectPeriodAllocationMode');
+        const feedbackBox = document.getElementById('formFeedbackBox');
+
+        const teacher = teacherInput.value.trim();
+        const subjectsList = getEffectiveSelectedSubjects();
+        const inputPeriods = Math.max(1, Math.min(60, Number(periodsInput.value) || state.teacherTargetQuota));
+        const mode = modeSelect.value;
+        const selectedIds = Array.from(state.selectedFormClassIds);
+
+        if (!teacher || subjectsList.length === 0) {
+          feedbackBox.textContent = 'Please enter a Teacher Name and select or type at least one Subject.';
+          feedbackBox.style.background = '#fef2f2';
+          feedbackBox.style.color = '#b91c1c';
+          feedbackBox.style.border = '1px solid #fecaca';
+          feedbackBox.classList.remove('hidden');
+          return;
+        }
+
+        if (selectedIds.length === 0) {
+          feedbackBox.textContent = 'Please select at least one class.';
+          feedbackBox.style.background = '#fef2f2';
+          feedbackBox.style.color = '#b91c1c';
+          feedbackBox.style.border = '1px solid #fecaca';
+          feedbackBox.classList.remove('hidden');
+          return;
+        }
+
+        // Add any newly typed subjects to state.availableSubjects
+        subjectsList.forEach(subj => {
+          if (!state.availableSubjects.some(x => x.toLowerCase() === subj.toLowerCase())) {
+            state.availableSubjects.push(subj);
+          }
+        });
+
+        const tKey = teacher.toLowerCase();
+        const trialAssignments = state.assignments.map(a => ({ ...a }));
+
+        if (mode === 'total_teacher') {
+          selectedIds.forEach(cid => {
+            subjectsList.forEach(subj => {
+              const existingIdx = trialAssignments.findIndex(
+                a => a.classId === cid &&
+                     a.teacher.trim().toLowerCase() === tKey &&
+                     a.subject.trim().toLowerCase() === subj.toLowerCase()
+              );
+              if (existingIdx < 0) {
+                trialAssignments.unshift({
+                  id: 'asg_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+                  teacher,
+                  subject: subj,
+                  classId: cid,
+                  periodsPerWeek: 1
+                });
+              }
+            });
+          });
+          rebalanceTeacherToQuota(trialAssignments, teacher, inputPeriods);
+        } else {
+          selectedIds.forEach(cid => {
+            subjectsList.forEach(subj => {
+              const existingIdx = trialAssignments.findIndex(
+                a => a.classId === cid &&
+                     a.teacher.trim().toLowerCase() === tKey &&
+                     a.subject.trim().toLowerCase() === subj.toLowerCase()
+              );
+              if (existingIdx >= 0) {
+                trialAssignments[existingIdx].periodsPerWeek = inputPeriods;
+              } else {
+                trialAssignments.unshift({
+                  id: 'asg_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+                  teacher,
+                  subject: subj,
+                  classId: cid,
+                  periodsPerWeek: inputPeriods
+                });
+              }
+            });
+          });
+        }
+
+        state.assignments = trialAssignments;
+        feedbackBox.classList.add('hidden');
+        state.selectedFormSubjects.clear();
+        subjectInput.value = '';
+        saveState();
+        generateTimetable();
+        renderAll();
+        showToast(`Assigned ${teacher} (${subjectsList.join(', ')}) across ${selectedIds.length} class(es).`);
+      });
+
+      document.getElementById('inputFilterRoster').addEventListener('input', (e) => {
+        state.rosterFilter = e.target.value;
+        renderRosterAndLoads();
+      });
+
+      document.getElementById('rosterTableBody').addEventListener('click', (e) => {
+        const delBtn = e.target.closest('[data-delete-id]');
+        if (delBtn) {
+          const id = delBtn.getAttribute('data-delete-id');
+          state.assignments = state.assignments.filter(a => a.id !== id);
+          saveState();
+          generateTimetable();
+          renderAll();
+          showToast('Assignment removed and timetable updated.');
+        }
+      });
+
+      document.getElementById('btnLoadSample').addEventListener('click', () => {
+        state.assignments = getDefaultAssignments(state.teacherTargetQuota, state.classes);
+        saveState();
+        generateTimetable();
+        renderAll();
+        showToast(`Loaded sample data (${state.teacherTargetQuota} periods per teacher).`);
+      });
+
+      document.getElementById('btnClearAll').addEventListener('click', () => {
+        state.assignments = [];
+        saveState();
+        generateTimetable();
+        renderAll();
+        showToast('Cleared all assignments.');
+      });
+
+      document.getElementById('inputPeriodsPerDay').addEventListener('change', (e) => {
+        const val = Math.max(1, Math.min(12, Number(e.target.value) || 8));
+        state.periodsPerDay = val;
+        state.breaks.forEach(b => {
+          if (b.afterPeriod > val) b.afterPeriod = val;
+        });
+        saveState();
+        generateTimetable();
+        renderAll();
+        showToast(`Updated daily schedule to ${val} teaching periods per day.`);
+      });
+
+      document.getElementById('breaksEditorList').addEventListener('change', (e) => {
+        const input = e.target.closest('[data-break-id]');
+        if (input) {
+          const bid = input.getAttribute('data-break-id');
+          const field = input.getAttribute('data-break-field');
+          const brk = state.breaks.find(b => b.id === bid);
+          if (brk) {
+            if (field === 'afterPeriod') {
+              brk.afterPeriod = Math.max(1, Math.min(state.periodsPerDay, Number(input.value) || 1));
+            } else {
+              brk[field] = input.value.trim() || 'Break';
+            }
+            saveState();
+            renderAll();
+            showToast(`Updated ${brk.label} configuration.`);
+          }
+        }
+      });
+
+      document.getElementById('breaksEditorList').addEventListener('click', (e) => {
+        const delBtn = e.target.closest('[data-delete-break]');
+        if (delBtn) {
+          const bid = delBtn.getAttribute('data-delete-break');
+          state.breaks = state.breaks.filter(b => b.id !== bid);
+          saveState();
+          renderAll();
+          showToast('Removed break from daily schedule.');
+        }
+      });
+
+      document.getElementById('formAddBreak').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const labelEl = document.getElementById('inputNewBreakLabel');
+        const subEl = document.getElementById('inputNewBreakSub');
+        const afterEl = document.getElementById('inputNewBreakAfter');
+
+        const label = labelEl.value.trim() || `Break ${state.breaks.length + 1}`;
+        const sub = subEl.value.trim() || 'Break';
+        const afterPeriod = Math.max(1, Math.min(state.periodsPerDay, Number(afterEl.value) || 2));
+
+        state.breaks.push({
+          id: 'brk_' + Date.now(),
+          label,
+          sub,
+          afterPeriod,
+          color: state.breaks.length % 2 === 0 ? 'amber' : 'emerald'
+        });
+
+        labelEl.value = '';
+        subEl.value = '';
+        saveState();
+        renderAll();
+        showToast(`Added ${label} after Period ${afterPeriod}.`);
+      });
+
+      document.getElementById('btnResetScheduleStructure').addEventListener('click', () => {
+        state.periodsPerDay = 8;
+        state.breaks = getDefaultBreaks();
+        saveState();
+        generateTimetable();
+        renderAll();
+        showToast('Restored default 8 periods + Break 1 (after P2) & Salah Break (after P7).');
+      });
+
+      document.getElementById('formAddClass').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const nameEl = document.getElementById('inputNewClassName');
+        const stdEl = document.getElementById('inputNewClassStd');
+        const secEl = document.getElementById('selectNewClassSection');
+        const grpEl = document.getElementById('selectNewClassGroup');
+
+        const name = nameEl.value.trim();
+        const std = stdEl.value.trim();
+        if (!name || !std) return;
+
+        const newClass = {
+          id: 'CLS_' + Date.now(),
+          name,
+          std,
+          section: secEl.value,
+          group: grpEl.value
+        };
+
+        state.classes.push(newClass);
+        state.selectedFormClassIds.add(newClass.id);
+        nameEl.value = '';
+        stdEl.value = '';
+        saveState();
+        generateTimetable();
+        renderAll();
+        showToast(`Added class "${name}".`);
+      });
+
+      document.getElementById('classesAuditBody').addEventListener('change', (e) => {
+        const el = e.target.closest('[data-class-id]');
+        if (el) {
+          const cid = el.getAttribute('data-class-id');
+          const field = el.getAttribute('data-class-field');
+          const cls = state.classes.find(c => c.id === cid);
+          if (cls) {
+            cls[field] = el.value.trim() || cls[field];
+            saveState();
+            renderAll();
+            showToast(`Updated class "${cls.name}".`);
+          }
+        }
+      });
+
+      document.getElementById('classesAuditBody').addEventListener('click', (e) => {
+        const delBtn = e.target.closest('[data-delete-class]');
+        if (delBtn) {
+          const cid = delBtn.getAttribute('data-delete-class');
+          const target = state.classes.find(c => c.id === cid);
+          state.classes = state.classes.filter(c => c.id !== cid);
+          state.assignments = state.assignments.filter(a => a.classId !== cid);
+          state.selectedFormClassIds.delete(cid);
+          saveState();
+          generateTimetable();
+          renderAll();
+          showToast(`Removed class "${target ? target.name : cid}".`);
+        }
+      });
+
+      document.getElementById('btnResetClasses').addEventListener('click', () => {
+        state.classes = getDefaultClasses();
+        saveState();
+        generateTimetable();
+        renderAll();
+        showToast('Restored default 19 classes.');
+      });
+    }
+
+    function bootApp() {
+      loadSavedState();
+      document.getElementById('selectWeekDays').value = String(state.daysCount);
+      document.getElementById('inputPeriodsPerWeek').value = String(state.teacherTargetQuota);
+      document.getElementById('inputGlobalTeacherQuota').value = String(state.teacherTargetQuota);
+      generateTimetable();
+      initEvents();
+      renderAll();
+    }
+
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', bootApp);
+    } else {
+      bootApp();
+    }
+  </script>
+</body>
+</html>
